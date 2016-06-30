@@ -1,0 +1,42 @@
+machine:
+  services:
+    - docker
+  environment:
+    GOPATH: $HOME
+    GO15VENDOREXPERIMENT: 1  # Because this is golang 1.5
+
+checkout:
+  post:
+    - mkdir -p $HOME/src/github.com/premkit
+    - cp -r $HOME/premkit $HOME/src/github.com/premkit/premkit
+
+dependencies:
+  override:
+    - go get -u github.com/kardianos/govendor
+    - cd $HOME/src/github.com/premkit/premkit && make build
+  post:
+    - cp $HOME/src/github.com/premkit/premkit/bin/premkit $CIRCLE_ARTIFACTS
+
+test:
+  pre:
+    - GOPATH=/tmp go get github.com/axw/gocov/gocov
+    - GOPATH=/tmp go get github.com/mattn/goveralls
+    - go get github.com/stretchr/testify/assert
+    - go get gopkg.in/DATA-DOG/go-sqlmock.v1
+    - if ! GOPATH=/tmp go get github.com/golang/tools/cmd/cover; then GOPATH=/tmp go get golang.org/x/tools/cmd/cover; fi
+  override:
+    - echo "test" # cd $HOME/src/github.com/premkit/premkit/test && ./coverage.bash ./packages.txt ./profile.cov
+
+deployment:
+  docker:
+    branch: master
+    owner: premkit
+    commands:
+      - rm $HOME/src/github.com/premkit/premkit/Dockerfile
+      - mv $HOME/src/github.com/premkit/premkit/deploy/Dockerfile $HOME/src/github.com/premkit/premkit/Dockerfile
+      - sudo docker build -t premkit/premkit:${CIRCLE_SHA1:0:7} $HOME/src/github.com/premkit/premkit
+      - sudo docker login -e $DOCKER_EMAIL -u $DOCKER_USER -p $DOCKER_PASS
+      - sudo docker push premkit/premkit:${CIRCLE_SHA1:0:7}
+      - sudo docker tag premkit/premkit:${CIRCLE_SHA1:0:7} premkit/premkit:latest
+      - sudo docker push premkit/premkit:latest
+
