@@ -26,6 +26,8 @@ test:
     - if ! GOPATH=/tmp go get github.com/golang/tools/cmd/cover; then GOPATH=/tmp go get golang.org/x/tools/cmd/cover; fi
   override:
     - cd $HOME/src/github.com/premkit/premkit/test && ./coverage.bash ./packages.txt ./profile.cov
+  post:
+    - /tmp/bin/goveralls -service=circle-ci -repotoken=$COVERALLS_REPO_TOKEN -coverprofile=$HOME/src/github.com/premkit/premkit/test/profile.cov
 
 deployment:
   docker:
