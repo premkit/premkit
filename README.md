@@ -1,4 +1,4 @@
-premkit
+Premkit [![CircleCI](https://circleci.com/gh/premkit/premkit.svg?style=svg)](https://circleci.com/gh/premkit/premkit) [![Coverage Status](https://coveralls.io/repos/github/premkit/premkit/badge.svg?branch=master)](https://coveralls.io/github/premkit/premkit?branch=master)
 =======
 
 ## Setup
