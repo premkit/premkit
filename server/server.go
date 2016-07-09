@@ -1,0 +1,29 @@
+package server
+
+import (
+	"fmt"
+
+	"github.com/premkit/premkit/handlers/v1"
+	"github.com/premkit/premkit/log"
+	"net/http"
+
+	"github.com/gorilla/mux"
+)
+
+// Run is the main entrypoint of this daemon.
+func Run(bind int) {
+	go func() {
+		router := mux.NewRouter()
+
+		internal := router.PathPrefix("/premkit").Subrouter()
+		internalV1 := internal.PathPrefix("/v1").Subrouter()
+		internalV1.HandleFunc("/service", v1.RegisterService).Methods("POST")
+
+		// TODO serve the swagger.json using a gorilla static handlers
+
+		forward := router.PathPrefix("/").Subrouter()
+		forward.HandleFunc("/{path:.*}", v1.ForwardService)
+
+		log.Error(http.ListenAndServe(fmt.Sprintf(":%d", bind), router))
+	}()
+}

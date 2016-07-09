@@ -1,10 +1,8 @@
-package daemon
+package v1
 
 import (
-	"encoding/json"
 	"errors"
 	"fmt"
-	"io/ioutil"
 	"net/http"
 	"net/url"
 	"os"
@@ -12,7 +10,6 @@ import (
 
 	"github.com/premkit/premkit/log"
 	"github.com/premkit/premkit/models"
-	"github.com/premkit/premkit/schema"
 
 	"github.com/vulcand/oxy/forward"
 )
@@ -31,43 +28,10 @@ func init() {
 	fwd = f
 }
 
-// RegisterService is the handler called when a POST is made to register a new service.
-func RegisterService(response http.ResponseWriter, request *http.Request) {
-	body, err := ioutil.ReadAll(request.Body)
-	if err != nil {
-		log.Error(err)
-		http.Error(response, fmt.Sprintf("%+v", err), http.StatusInternalServerError)
-		return
-	}
+// TODO Swagger this handler, but it's a special handler and therefore a little trickier to swagger-ify
 
-	registerServiceRequest := schema.RegisterServiceRequest{}
-	if err := json.Unmarshal(body, &registerServiceRequest); err != nil {
-		log.Error(err)
-		http.Error(response, fmt.Sprintf("%+v", err), http.StatusInternalServerError)
-		return
-	}
-
-	service, err := models.CreateService(registerServiceRequest.Service)
-	if err != nil {
-		http.Error(response, fmt.Sprintf("%+v", err), http.StatusInternalServerError)
-		return
-	}
-
-	registerServiceResponse := schema.RegisterServiceResponse{
-		Service: service,
-	}
-	b, err := json.Marshal(registerServiceResponse)
-	if err != nil {
-		log.Error(err)
-		http.Error(response, fmt.Sprintf("%+v", err), http.StatusInternalServerError)
-	}
-
-	response.WriteHeader(http.StatusCreated)
-	response.Write(b)
-}
-
-// MaybeForwardService is the handler for anything that should be possibly fowarded to an upstream.
-func MaybeForwardService(response http.ResponseWriter, request *http.Request) {
+// ForwardService is the handler for anything that should be possibly fowarded to an upstream.
+func ForwardService(response http.ResponseWriter, request *http.Request) {
 	// TODO keep these cached because in any reasonable load this will be painful
 	services, err := models.ListServices()
 	if err != nil {

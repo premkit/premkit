@@ -1,7 +1,7 @@
 
-github.com/premkit/premkit/daemon
+github.com/premkit/premkit/server
+github.com/premkit/handlers/v1
 github.com/premkit/premkit/persistence
-github.com/premkit/premkit/schema
 github.com/premkit/premkit/utils
 github.com/premkit/premkit/models
 github.com/premkit/premkit

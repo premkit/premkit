@@ -2,9 +2,10 @@ package main
 
 import (
 	"math/rand"
+	"runtime"
 	"time"
 
-	"github.com/premkit/premkit/daemon"
+	"github.com/premkit/premkit/commands"
 )
 
 func init() {
@@ -12,8 +13,8 @@ func init() {
 }
 
 func main() {
-	// Start the HTTP server.
-	daemon.Run()
+	runtime.GOMAXPROCS(runtime.NumCPU())
+	commands.Execute()
 
 	<-make(chan int)
 }
