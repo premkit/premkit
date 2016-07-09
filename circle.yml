@@ -22,7 +22,6 @@ test:
     - GOPATH=/tmp go get github.com/axw/gocov/gocov
     - GOPATH=/tmp go get github.com/mattn/goveralls
     - go get github.com/stretchr/testify/assert
-    - go get gopkg.in/DATA-DOG/go-sqlmock.v1
     - if ! GOPATH=/tmp go get github.com/golang/tools/cmd/cover; then GOPATH=/tmp go get golang.org/x/tools/cmd/cover; fi
   override:
     - cd $HOME/src/github.com/premkit/premkit/test && ./coverage.bash ./packages.txt ./profile.cov
