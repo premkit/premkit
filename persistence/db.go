@@ -1,9 +1,13 @@
 package persistence
 
 import (
+	"os"
+	"path/filepath"
+
 	"github.com/premkit/premkit/log"
 
 	"github.com/boltdb/bolt"
+	"github.com/spf13/viper"
 )
 
 // DB is the lazy-loaded reference to the BoltDB instance.  Use the GetDB() function to obtain this.
@@ -16,7 +20,12 @@ func GetDB() (*bolt.DB, error) {
 		return DB, nil
 	}
 
-	conn, err := bolt.Open("/data/premkit.db", 0600, nil)
+	if err := os.MkdirAll(filepath.Dir(viper.GetString("data_file")), 0755); err != nil {
+		log.Error(err)
+		return nil, err
+	}
+
+	conn, err := bolt.Open(viper.GetString("data_file"), 0600, nil)
 	if err != nil {
 		log.Error(err)
 		return nil, err
