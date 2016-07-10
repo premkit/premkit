@@ -4,6 +4,7 @@ import (
 	"os"
 
 	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 )
 
 // PremKitCmd is the main (root) command for the CLI.
@@ -13,6 +14,10 @@ var PremKitCmd = &cobra.Command{
 	Long:  "premkit is the reverse proxy, used to ship installable software",
 
 	RunE: func(cmd *cobra.Command, args []string) error {
+		if err := InitializeConfig(); err != nil {
+			return err
+		}
+
 		cmd.Usage()
 		os.Exit(-1)
 		return nil
@@ -31,4 +36,11 @@ func Execute() {
 // AddCommands will add all child commands to the PremKitCmd
 func AddCommands() {
 	PremKitCmd.AddCommand(daemonCmd)
+}
+
+// InitializeConfig initializes the config environment with defaults.
+func InitializeConfig(subCmdVs ...*cobra.Command) error {
+	viper.AutomaticEnv()
+	viper.SetEnvPrefix("premkit")
+	return nil
 }

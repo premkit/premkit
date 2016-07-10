@@ -4,6 +4,7 @@ machine:
   environment:
     GOPATH: $HOME
     GO15VENDOREXPERIMENT: 1  # Because this is golang 1.5
+    PREMKIT_DATA_FILE: /tmp/premkit.db
 
 checkout:
   post:

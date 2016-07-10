@@ -25,13 +25,17 @@ and for requests to forward to backend services.`,
 func init() {
 	daemonCmd.Flags().IntVarP(&port, "bind", "b", 80, "port on which the reverse proxy will bind and listen")
 	daemonCmd.Flags().StringVarP(&dataFile, "datafile", "d", "/data/premkit.db", "location of the database file")
+	viper.BindPFlag("data_file", daemonCmd.Flags().Lookup("datafile"))
 
 	daemonCmd.RunE = daemon
 }
 
 func daemon(cmd *cobra.Command, args []string) error {
-	viper.Set("data_file", dataFile)
-	server.Run(80)
+	if err := InitializeConfig(daemonCmd); err != nil {
+		return err
+	}
+
+	server.Run(port)
 
 	return nil
 }

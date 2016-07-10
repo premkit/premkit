@@ -20,6 +20,8 @@ func GetDB() (*bolt.DB, error) {
 		return DB, nil
 	}
 
+	log.Debugf("Creating connection to data_file at %s", viper.GetString("data_file"))
+
 	if err := os.MkdirAll(filepath.Dir(viper.GetString("data_file")), 0755); err != nil {
 		log.Error(err)
 		return nil, err
