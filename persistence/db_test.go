@@ -22,7 +22,7 @@ func TestGetDB(t *testing.T) {
 	originalDataFile := viper.GetString("data_file")
 	defer viper.Set("data_file", originalDataFile)
 
-	viper.Set("data_file", "/data/testing.db")
+	viper.Set("data_file", "/tmp/testing.db")
 
 	db, err := GetDB()
 	require.NoError(t, err)
@@ -33,7 +33,7 @@ func TestGetDB(t *testing.T) {
 	assert.Equal(t, db, db2)
 
 	db.Close()
-	os.RemoveAll("/data/testing.db")
+	os.RemoveAll("/tmp/testing.db")
 }
 
 func TestInitializeDatabase(t *testing.T) {
