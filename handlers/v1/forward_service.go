@@ -42,14 +42,7 @@ func ForwardService(response http.ResponseWriter, request *http.Request) {
 	var url *url.URL
 
 	for _, service := range services {
-		path := strings.TrimPrefix(request.URL.Path, "/")
-
-		pathParts := strings.Split(path, "/")
-		if len(pathParts) == 0 {
-			continue
-		}
-
-		if pathParts[0] != service.Path {
+		if !isPathPrefix(service.Path, request.URL.Path) {
 			continue
 		}
 
@@ -63,7 +56,7 @@ func ForwardService(response http.ResponseWriter, request *http.Request) {
 			return
 		}
 
-		childPath := strings.Join(pathParts[1:], "/")
+		childPath := createForwardPath(service.Path, request.URL.Path)
 		request.RequestURI = "/" + childPath
 
 		log.Debugf("service.Upstreams = %s/%s", service.Upstreams[0], childPath)
@@ -84,4 +77,23 @@ func ForwardService(response http.ResponseWriter, request *http.Request) {
 
 	request.URL = url
 	fwd.ServeHTTP(response, request)
+}
+
+func stripLeadingSlashIfPresent(path string) string {
+	return strings.TrimPrefix(path, "/")
+}
+
+func isPathPrefix(servicePath, requestPath string) bool {
+	servicePath = stripLeadingSlashIfPresent(servicePath)
+	requestPath = stripLeadingSlashIfPresent(requestPath)
+
+	return strings.HasPrefix(requestPath, servicePath)
+}
+
+func createForwardPath(servicePath, requestPath string) string {
+	servicePath = stripLeadingSlashIfPresent(servicePath)
+	requestPath = stripLeadingSlashIfPresent(requestPath)
+
+	// Remove the servicePath from the requestPath
+	return strings.TrimPrefix(requestPath, servicePath)
 }
