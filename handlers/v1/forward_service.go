@@ -57,7 +57,7 @@ func ForwardService(response http.ResponseWriter, request *http.Request) {
 		}
 
 		childPath := createForwardPath(service.Path, request.URL.Path)
-		request.RequestURI = "/" + childPath
+		request.RequestURI = childPath
 
 		log.Debugf("service.Upstreams = %s/%s", service.Upstreams[0], childPath)
 		u, err := url.Parse(fmt.Sprintf("%s/%s", service.Upstreams[0], childPath))
