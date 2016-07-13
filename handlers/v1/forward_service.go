@@ -39,35 +39,44 @@ func ForwardService(response http.ResponseWriter, request *http.Request) {
 		return
 	}
 
-	var url *url.URL
+	var service *models.Service
 
-	for _, service := range services {
-		if !isPathPrefix(service.Path, request.URL.Path) {
+	log.Debugf("Looking for a known route with prefix %q", request.URL.Path)
+	for _, s := range services {
+		if !isPathPrefix(s.Path, request.URL.Path) {
+			log.Debugf("Service with path %q did not match", s.Path)
 			continue
 		}
 
-		log.Debugf("path %q matched service %q (service path %q)", request.URL.Path, service.Name, service.Path)
+		log.Debugf("path %q matched service %q (service path %q)", request.URL.Path, s.Name, s.Path)
+		service = s
 
-		if len(service.Upstreams) == 0 {
-			err := errors.New("No upstreams are available")
-			log.Error(err)
-			response.WriteHeader(http.StatusBadGateway)
-			response.Write([]byte(""))
-			return
-		}
+		break
+	}
 
-		childPath := createForwardPath(service.Path, request.URL.Path)
-		request.RequestURI = childPath
+	if service == nil {
+		response.WriteHeader(http.StatusNotFound)
+		response.Write([]byte(""))
+		return
+	}
 
-		log.Debugf("service.Upstreams = %s%s", service.Upstreams[0], childPath)
-		u, err := url.Parse(fmt.Sprintf("%s%s", service.Upstreams[0], childPath))
-		if err != nil {
-			log.Error(err)
-			http.Error(response, fmt.Sprintf("%+v", err), http.StatusInternalServerError)
-			return
-		}
+	if len(service.Upstreams) == 0 {
+		err := errors.New("No upstreams are available")
+		log.Error(err)
+		response.WriteHeader(http.StatusBadGateway)
+		response.Write([]byte(""))
+		return
+	}
 
-		url = u
+	// TODO pick an upstream with some intelligence
+
+	// The upstream we will forward to
+	upstream := service.Upstreams[0]
+
+	url, err := getForwardURLForServiceRequest(upstream, service, request.URL.Path)
+	if err != nil {
+		http.Error(response, fmt.Sprintf("%+v", err), http.StatusInternalServerError)
+		return
 	}
 
 	if url == nil {
@@ -76,6 +85,8 @@ func ForwardService(response http.ResponseWriter, request *http.Request) {
 	}
 
 	request.URL = url
+	request.RequestURI = url.Path
+
 	fwd.ServeHTTP(response, request)
 }
 
@@ -96,4 +107,31 @@ func createForwardPath(servicePath, requestPath string) string {
 
 	// Remove the servicePath from the requestPath
 	return strings.TrimPrefix(requestPath, servicePath)
+}
+
+// TODO refactor this out into a new module
+func getForwardURLForServiceRequest(upstream *models.Upstream, service *models.Service, path string) (*url.URL, error) {
+	childPath := createForwardPath(service.Path, path)
+	//request.RequestURI = childPath
+
+	// The built url we will forward to
+	upstreamURL := ""
+	if upstream.IncludeServicePath {
+		log.Debugf("including service path in upstream URL")
+		upstreamURL = fmt.Sprintf("%s/%s%s", upstream.URL, service.Path, childPath)
+	} else {
+		log.Debugf("NOT including service path in upstream URL")
+		upstreamURL = fmt.Sprintf("%s%s", upstream.URL, childPath)
+	}
+
+	upstreamURL = strings.TrimPrefix(upstreamURL, "/")
+
+	url, err := url.Parse(upstreamURL)
+	if err != nil {
+		log.Error(err)
+		return nil, err
+	}
+
+	log.Debugf("new url = %#v", url)
+	return url, nil
 }

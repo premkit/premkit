@@ -15,9 +15,9 @@ import (
 
 // Service represents a single registered service with this reverse proxy.
 type Service struct {
-	Name      string   `json:"name"`
-	Path      string   `json:"path"`
-	Upstreams []string `json:"upstreams"`
+	Name      string      `json:"name"`
+	Path      string      `json:"path"`
+	Upstreams []*Upstream `json:"upstreams"`
 
 	Registered time.Time `json:"registered"`
 }
@@ -33,13 +33,21 @@ func ListServices() ([]*Service, error) {
 	}
 
 	err = db.View(func(tx *bolt.Tx) error {
-		tx.ForEach(func(name []byte, b *bolt.Bucket) error {
-			// Maybe we should prefix the service buckets instead of excluding other known ones.
-			if string(name) == "Services" {
+		tx.ForEach(func(bucketName []byte, b *bolt.Bucket) error {
+			if !strings.HasPrefix(string(bucketName), "service:") {
 				return nil
 			}
 
-			service, err := getServiceByName(name)
+			s := strings.Split(string(bucketName), ":")
+			if len(s) < 2 {
+				err = fmt.Errorf("Unexpected bucket name: %q", bucketName)
+				log.Error(err)
+				return nil
+			}
+
+			serviceName := strings.Join(s[1:], ":")
+
+			service, err := getServiceByName([]byte(serviceName))
 			if err != nil {
 				return err
 			}
@@ -74,89 +82,147 @@ func CreateService(service *Service) (*Service, error) {
 	service.Path = strings.TrimPrefix(service.Path, "/")
 
 	// If the service already exists, we just want to update it with a new upstream
-	s, err := maybeGetServiceByName([]byte(service.Name))
+	current, err := maybeGetServiceByName([]byte(service.Name))
 	if err != nil {
 		return nil, err
 	}
+
+	if current == nil {
+		return createNewService(service)
+	}
+
+	return updateService(current, service)
+}
+
+func updateService(current *Service, service *Service) (*Service, error) {
+	db, err := persistence.GetDB()
+	if err != nil {
+		return nil, err
+	}
+
+	err = db.Update(func(tx *bolt.Tx) error {
+		serviceBucket := tx.Bucket([]byte(fmt.Sprintf("service:%s", service.Name)))
+
+		// Update the path
+		if err := serviceBucket.Put([]byte("path"), []byte(service.Path)); err != nil {
+			log.Error(err)
+			return err
+		}
+
+		// TODO update the registration date
+
+		// On update, we merge these upstreams into the current upstreams
+		upstreamURLs := make([]string, 0, 0)
+		for _, u := range current.Upstreams {
+			upstreamURLs = append(upstreamURLs, u.URL)
+		}
+		for _, u := range service.Upstreams {
+			upstreamURLs = append(upstreamURLs, u.URL)
+		}
+		upstreamURLs = utils.RemoveDuplicates(upstreamURLs)
+
+		combinedUpstreams := make([]*Upstream, 0, 0)
+		for _, url := range upstreamURLs {
+			// Check for this upstream in the new service first
+			added := false
+			for _, upstream := range service.Upstreams {
+				if upstream.URL == url {
+					combinedUpstreams = append(combinedUpstreams, upstream)
+					added = true
+					break
+				}
+			}
+
+			if !added {
+				for _, upstream := range current.Upstreams {
+					if upstream.URL == url {
+						combinedUpstreams = append(combinedUpstreams, upstream)
+						added = true
+						break
+					}
+				}
+			}
+		}
+
+		service.Upstreams = combinedUpstreams
+
+		for _, upstream := range combinedUpstreams {
+			if err := SaveUpstream(upstream, tx); err != nil {
+				return err
+			}
+
+			// And save the reference
+			if err := serviceBucket.Put([]byte(fmt.Sprintf("upstream:%s", upstream.URL)), []byte(upstream.URL)); err != nil {
+				log.Error(err)
+				return err
+			}
+		}
+
+		return nil
+	})
+
+	if err != nil {
+		return nil, err
+	}
+
+	return service, nil
+}
+
+func createNewService(service *Service) (*Service, error) {
+	// Create a new service
+	service.Registered = time.Now()
 
 	db, err := persistence.GetDB()
 	if err != nil {
 		return nil, err
 	}
 
-	if s == nil {
-		// Create a new service
-		s = &Service{
-			Name:      service.Name,
-			Path:      service.Path,
-			Upstreams: service.Upstreams,
-
-			Registered: time.Now(),
-		}
-
-		err := db.Update(func(tx *bolt.Tx) error {
-			serviceBucket, err := tx.CreateBucket([]byte(s.Name))
-			if err != nil {
-				log.Error(err)
-				return err
-			}
-
-			// Write the path
-			if err := serviceBucket.Put([]byte("path"), []byte(s.Path)); err != nil {
-				log.Error(err)
-				return err
-			}
-
-			// Write the upstreams
-			for _, upstream := range service.Upstreams {
-				log.Debugf("Creating upstream %q for service %q", upstream, s.Name)
-				if err := serviceBucket.Put([]byte(fmt.Sprintf("upstream:%s:url", upstream)), []byte(upstream)); err != nil {
-					log.Error(err)
-					return err
-				}
-			}
-
-			return nil
-		})
+	err = db.Update(func(tx *bolt.Tx) error {
+		serviceBucket, err := tx.CreateBucket([]byte(fmt.Sprintf("service:%s", service.Name)))
 		if err != nil {
-			return nil, err
+			log.Error(err)
+			return err
 		}
-	} else {
-		// Update the existing service
-		s.Name = service.Name
 
-		err := db.Update(func(tx *bolt.Tx) error {
-			serviceBucket := tx.Bucket([]byte(s.Name))
+		// Write the path
+		if err := serviceBucket.Put([]byte("path"), []byte(service.Path)); err != nil {
+			log.Error(err)
+			return err
+		}
 
-			// Update the path
-			if err := serviceBucket.Put([]byte("path"), []byte(s.Path)); err != nil {
+		// TODO write the registration date
+
+		// Write the upstreams
+		for _, upstream := range service.Upstreams {
+			// upstream are stored in the service bucket, but these are
+			// just references to the upstream buckets themselves.  the details
+			// of an upstream must be read from the upstream bucket.
+			log.Debugf("Saving upstream with URL %q", upstream.URL)
+			if err := SaveUpstream(upstream, tx); err != nil {
+				return err
+			}
+
+			// And save the reference
+			if err := serviceBucket.Put([]byte(fmt.Sprintf("upstream:%s", upstream.URL)), []byte(upstream.URL)); err != nil {
 				log.Error(err)
 				return err
 			}
 
-			// Don't create multiple upstreams with the same url, so check if it exists
-			toCreate := utils.DiffArrays(service.Upstreams, s.Upstreams)
-			for _, upstream := range toCreate {
-				log.Debugf("Adding upstream %q to service %q", upstream, service.Name)
-				if err := serviceBucket.Put([]byte(fmt.Sprintf("upstream:%s:url", upstream)), []byte(upstream)); err != nil {
-					log.Error(err)
-					return err
-				}
-
-				s.Upstreams = append(s.Upstreams, upstream)
-			}
-
-			return nil
-		})
-		if err != nil {
-			return nil, err
+			log.Debugf("Saved upstream with URL %q", upstream.URL)
 		}
+
+		return nil
+	})
+
+	if err != nil {
+		return nil, err
 	}
 
-	return s, nil
+	return service, nil
 }
 
 func maybeGetServiceByName(name []byte) (*Service, error) {
+	log.Debugf("Attempting to load a service named %q", name)
 	db, err := persistence.GetDB()
 	if err != nil {
 		return nil, err
@@ -168,7 +234,7 @@ func maybeGetServiceByName(name []byte) (*Service, error) {
 
 	ok := false
 	err = db.View(func(tx *bolt.Tx) error {
-		serviceBucket := tx.Bucket(name)
+		serviceBucket := tx.Bucket([]byte(fmt.Sprintf("service:%s", name)))
 		if serviceBucket == nil {
 			return nil
 		}
@@ -176,10 +242,18 @@ func maybeGetServiceByName(name []byte) (*Service, error) {
 		ok = true
 		service.Path = string(serviceBucket.Get([]byte("path")))
 
-		service.Upstreams = make([]string, 0, 0)
+		service.Upstreams = make([]*Upstream, 0, 0)
 		err := serviceBucket.ForEach(func(k, v []byte) error {
-			if strings.HasPrefix(string(k), "upstream:") && strings.HasSuffix(string(k), ":url") {
-				service.Upstreams = append(service.Upstreams, string(v))
+			log.Debugf("key: %q", k)
+			if strings.HasPrefix(string(k), "upstream:") {
+				upstream, err := maybeGetUpstreamByURL(v)
+				if err != nil {
+					return err
+				}
+
+				if upstream != nil {
+					service.Upstreams = append(service.Upstreams, upstream)
+				}
 			}
 			if err != nil {
 				log.Error(err)

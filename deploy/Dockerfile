@@ -1,7 +1,5 @@
 FROM debian:jessie
 
-ADD bin/premkit /premkit
-
 RUN apt-get -y update && \
     apt-get -y --no-install-recommends install ca-certificates && \
     rm -rf /var/lib/apt/lists/*
@@ -9,6 +7,8 @@ RUN apt-get -y update && \
 EXPOSE 80
 
 VOLUME ["/data"]
+
+ADD bin/premkit /premkit
 
 ENTRYPOINT ["/premkit"]
 CMD ["daemon"]
