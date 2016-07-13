@@ -33,26 +33,6 @@ func GetDB() (*bolt.DB, error) {
 		return nil, err
 	}
 
-	if err := initializeDatabase(conn); err != nil {
-		return nil, err
-	}
-
 	DB = conn
 	return DB, nil
-}
-
-func initializeDatabase(conn *bolt.DB) error {
-	// Perform some initialization
-	err := conn.Update(func(tx *bolt.Tx) error {
-		// Create the default buckets
-		_, err := tx.CreateBucketIfNotExists([]byte("Services"))
-		if err != nil {
-			log.Error(err)
-			return err
-		}
-
-		return nil
-	})
-
-	return err
 }
