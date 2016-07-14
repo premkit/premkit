@@ -298,3 +298,38 @@ func validateService(service *Service) error {
 	// TODO this.
 	return nil
 }
+
+// DeleteServiceByName will find any service matching the name, and delete it,
+// including any upstreams that are not referenced by other services.
+func DeleteServiceByName(name []byte) (bool, error) {
+	service, err := maybeGetServiceByName(name)
+	if err != nil {
+		return false, err
+	}
+
+	if service == nil {
+		// There was no matching service. No reason to error, just return.
+		return false, nil
+	}
+
+	// Delete the service
+	db, err := persistence.GetDB()
+	if err != nil {
+		return false, err
+	}
+
+	err = db.Update(func(tx *bolt.Tx) error {
+		err := tx.DeleteBucket([]byte(fmt.Sprintf("service:%s", name)))
+		if err != nil {
+			log.Error(err)
+			return err
+		}
+
+		// TODO delete the upstreams that we orphaned
+
+		return nil
+	})
+
+	return true, nil
+
+}

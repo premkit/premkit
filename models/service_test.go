@@ -13,47 +13,35 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestMain(m *testing.M) {
-	// Initialize a temp boltdb folder
-	dbPath, err := setup()
-	if err != nil {
-		os.Exit(1)
-	}
-	defer teardown(dbPath)
-
-	// Run the tests
-	result := m.Run()
-
-	os.Exit(result)
-}
-
-func setup() (string, error) {
+func setup(t *testing.T) string {
 	dirName, err := ioutil.TempDir("", "premkit-test")
-	if err != nil {
-		return "", err
-	}
+	require.NoError(t, err)
 
 	conn, err := bolt.Open(path.Join(dirName, "test.db"), 0600, nil)
-	if err != nil {
-		return "", err
-	}
+	require.NoError(t, err)
 
 	persistence.DB = conn
 
-	return dirName, nil
+	return dirName
 }
 
 func teardown(dbPath string) {
 	os.RemoveAll(dbPath)
 }
 
-func Test_0_ListServicesEmpty(t *testing.T) {
+func TestListServicesEmpty(t *testing.T) {
+	dbPath := setup(t)
+	defer teardown(dbPath)
+
 	services, err := ListServices()
 	require.NoError(t, err)
 	assert.Equal(t, 0, len(services), "there should be no services")
 }
 
-func Test_1_CreateService(t *testing.T) {
+func TestCreateService(t *testing.T) {
+	dbPath := setup(t)
+	defer teardown(dbPath)
+
 	service, err := CreateService(&Service{
 		Name: "name",
 		Path: "path_a",
@@ -73,7 +61,10 @@ func Test_1_CreateService(t *testing.T) {
 	assert.Equal(t, 1, len(services), "there should be 1 service")
 }
 
-func Test_2_UpdateService(t *testing.T) {
+func TestUpdateService(t *testing.T) {
+	dbPath := setup(t)
+	defer teardown(dbPath)
+
 	service, err := CreateService(&Service{
 		Name: "name_2",
 		Path: "path_2",
@@ -100,7 +91,7 @@ func Test_2_UpdateService(t *testing.T) {
 
 	services, err := ListServices()
 	require.NoError(t, err)
-	assert.Equal(t, 2, len(services), "there should be 2 services")
+	assert.Equal(t, 1, len(services), "there should be 1 service1")
 
 	var createdService *Service
 	for _, s := range services {
@@ -112,4 +103,26 @@ func Test_2_UpdateService(t *testing.T) {
 	assert.Equal(t, "name_2", createdService.Name)
 	assert.Equal(t, "path_2", createdService.Path)
 	assert.Equal(t, 2, len(createdService.Upstreams))
+}
+
+func TestDeleteServiceByName(t *testing.T) {
+	dbPath := setup(t)
+	defer teardown(dbPath)
+
+	deleted, err := DeleteServiceByName([]byte("test"))
+	require.NoError(t, err)
+	assert.Equal(t, false, deleted)
+
+	_, err = CreateService(&Service{
+		Name: "test",
+		Path: "path",
+		Upstreams: []*Upstream{
+			&Upstream{URL: "upstream"},
+		},
+	})
+	require.NoError(t, err)
+
+	deleted, err = DeleteServiceByName([]byte("test"))
+	require.NoError(t, err)
+	assert.Equal(t, true, deleted)
 }
