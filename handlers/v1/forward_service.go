@@ -86,7 +86,6 @@ func ForwardService(response http.ResponseWriter, request *http.Request) {
 
 	request.URL = url
 	request.RequestURI = url.Path
-
 	fwd.ServeHTTP(response, request)
 }
 
@@ -132,6 +131,5 @@ func getForwardURLForServiceRequest(upstream *models.Upstream, service *models.S
 		return nil, err
 	}
 
-	log.Debugf("new url = %#v", url)
 	return url, nil
 }
