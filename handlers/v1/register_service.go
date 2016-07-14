@@ -15,7 +15,8 @@ import (
 type RegisterServiceParams struct {
 	// Service registration parameters.
 	// In: body
-	Service *models.Service `json:"service"`
+	Service         *models.Service `json:"service"`
+	ReplaceExisting bool            `json:"replace_existing"`
 }
 
 // RegisterServiceResponse represents the response to a registerService call. This response
@@ -57,7 +58,7 @@ func RegisterService(response http.ResponseWriter, request *http.Request) {
 		return
 	}
 
-	service, err := models.CreateService(registerServiceParams.Service)
+	service, err := registerService(&registerServiceParams)
 	if err != nil {
 		http.Error(response, fmt.Sprintf("%+v", err), http.StatusInternalServerError)
 		return
@@ -74,4 +75,20 @@ func RegisterService(response http.ResponseWriter, request *http.Request) {
 
 	response.WriteHeader(http.StatusCreated)
 	response.Write(b)
+}
+
+func registerService(params *RegisterServiceParams) (*models.Service, error) {
+	if params.ReplaceExisting {
+		_, err := models.DeleteServiceByName([]byte(params.Service.Name))
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	service, err := models.CreateService(params.Service)
+	if err != nil {
+		return nil, err
+	}
+
+	return service, nil
 }
