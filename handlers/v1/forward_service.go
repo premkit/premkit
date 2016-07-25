@@ -1,6 +1,7 @@
 package v1
 
 import (
+	"crypto/tls"
 	"errors"
 	"fmt"
 	"net/http"
@@ -15,17 +16,32 @@ import (
 )
 
 var (
-	fwd *forward.Forwarder
+	fwdSecure   *forward.Forwarder
+	fwdInsecure *forward.Forwarder
 )
 
 func init() {
-	f, err := forward.New()
+	var insecureTransport http.RoundTripper = &http.Transport{
+		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
+	}
+	insecureRoundTripper := forward.RoundTripper(insecureTransport)
+	f, err := forward.New(insecureRoundTripper)
 	if err != nil {
 		log.Error(err)
 		os.Exit(1)
 	}
+	fwdInsecure = f
 
-	fwd = f
+	var secureTransport http.RoundTripper = &http.Transport{
+		TLSClientConfig: &tls.Config{InsecureSkipVerify: false},
+	}
+	secureRoundTripper := forward.RoundTripper(secureTransport)
+	f, err = forward.New(secureRoundTripper)
+	if err != nil {
+		log.Error(err)
+		os.Exit(1)
+	}
+	fwdSecure = f
 }
 
 // TODO Swagger this handler, but it's a special handler and therefore a little trickier to swagger-ify
@@ -86,7 +102,12 @@ func ForwardService(response http.ResponseWriter, request *http.Request) {
 
 	request.URL = url
 	request.RequestURI = url.Path
-	fwd.ServeHTTP(response, request)
+
+	if upstream.InsecureSkipVerify {
+		fwdInsecure.ServeHTTP(response, request)
+	}
+
+	fwdSecure.ServeHTTP(response, request)
 }
 
 func stripLeadingSlashIfPresent(path string) string {
@@ -116,10 +137,8 @@ func getForwardURLForServiceRequest(upstream *models.Upstream, service *models.S
 	// The built url we will forward to
 	upstreamURL := ""
 	if upstream.IncludeServicePath {
-		log.Debugf("including service path in upstream URL")
 		upstreamURL = fmt.Sprintf("%s/%s%s", upstream.URL, service.Path, childPath)
 	} else {
-		log.Debugf("NOT including service path in upstream URL")
 		upstreamURL = fmt.Sprintf("%s%s", upstream.URL, childPath)
 	}
 
