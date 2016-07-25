@@ -16,7 +16,7 @@ type Upstream struct {
 	URL string `json:"url"`
 
 	IncludeServicePath bool `json:"include_service_path"`
-	IgnoreInsecure     bool `json:"ignore_insecure"`
+	InsecureSkipVerify bool `json:"insecure_skip_verify"`
 }
 
 // SaveUpstream will persist an upstream to the database. This will check the
@@ -51,7 +51,7 @@ func SaveUpstream(upstream *Upstream, tx *bolt.Tx) error {
 			return err
 		}
 
-		if err := upstreamBucket.Put([]byte("ignore.insecure"), []byte(strconv.FormatBool(upstream.IgnoreInsecure))); err != nil {
+		if err := upstreamBucket.Put([]byte("insecure.skip.verify"), []byte(strconv.FormatBool(upstream.InsecureSkipVerify))); err != nil {
 			log.Error(err)
 			return err
 		}
@@ -77,7 +77,7 @@ func SaveUpstream(upstream *Upstream, tx *bolt.Tx) error {
 		return err
 	}
 
-	if err := upstreamBucket.Put([]byte("ignore.insecure"), []byte(strconv.FormatBool(upstream.IgnoreInsecure))); err != nil {
+	if err := upstreamBucket.Put([]byte("insecure.skip.verify"), []byte(strconv.FormatBool(upstream.InsecureSkipVerify))); err != nil {
 		log.Error(err)
 		return err
 	}
@@ -111,12 +111,12 @@ func maybeGetUpstreamByURL(url []byte) (*Upstream, error) {
 		}
 		upstream.IncludeServicePath = b
 
-		b, err = strconv.ParseBool(string(upstreamBucket.Get([]byte("ignore.insecure"))))
+		b, err = strconv.ParseBool(string(upstreamBucket.Get([]byte("insecure.skip.verify"))))
 		if err != nil {
 			log.Error(err)
 			return err
 		}
-		upstream.IgnoreInsecure = b
+		upstream.InsecureSkipVerify = b
 
 		return nil
 	})
