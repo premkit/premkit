@@ -8,6 +8,7 @@ import (
 
 	"github.com/premkit/premkit/server"
 
+	"github.com/spf13/viper"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -78,17 +79,15 @@ func TestBuildConfigFromFile(t *testing.T) {
 	require.NoError(t, err)
 
 	// Set up the test
-	httpPort = 0
-	httpsPort = 443
-	tlsKeyFile = path.Join(dirName, "key")
-	tlsCertFile = path.Join(dirName, "cert")
-	generateSelfSignedCert = false
+	viper.Set("key_file", path.Join(dirName, "key"))
+	viper.Set("cert_file", path.Join(dirName, "cert"))
+	viper.Set("self_signed", false)
 
 	config, err := buildConfig()
 	require.NoError(t, err)
 	assert.NotNil(t, config)
 	expectedConfig := server.Config{
-		HTTPPort:    0,
+		HTTPPort:    80,
 		HTTPSPort:   443,
 		TLSKeyFile:  path.Join(dirName, "key"),
 		TLSCertFile: path.Join(dirName, "cert"),

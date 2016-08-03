@@ -40,7 +40,6 @@ func AddCommands() {
 
 // InitializeConfig initializes the config environment with defaults.
 func InitializeConfig(subCmdVs ...*cobra.Command) error {
-	viper.AutomaticEnv()
 	viper.SetEnvPrefix("premkit")
 	return nil
 }
