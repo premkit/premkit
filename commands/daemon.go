@@ -19,7 +19,7 @@ const (
 	defaultGenerateSelfSignedCert = true
 
 	defaultDataFile = "/data/premkit.db"
-	defaultTLSStore = "/data/premkit.db"
+	defaultTLSStore = "/data/tls"
 )
 
 var daemonCmd = &cobra.Command{
