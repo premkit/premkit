@@ -101,7 +101,12 @@ func ForwardService(response http.ResponseWriter, request *http.Request) {
 	}
 
 	request.URL = url
-	request.RequestURI = url.Path
+
+	if len(url.Query()) == 0 {
+		request.RequestURI = url.Path
+	} else {
+		request.RequestURI = fmt.Sprintf("%s?%s", url.Path, url.Query().Encode())
+	}
 
 	if upstream.InsecureSkipVerify {
 		fwdInsecure.ServeHTTP(response, request)
