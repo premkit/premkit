@@ -89,7 +89,7 @@ func ForwardService(response http.ResponseWriter, request *http.Request) {
 	// The upstream we will forward to
 	upstream := service.Upstreams[0]
 
-	url, err := getForwardURLForServiceRequest(upstream, service, request.URL.Path)
+	url, err := getForwardURLForServiceRequest(upstream, service, request.URL)
 	if err != nil {
 		http.Error(response, fmt.Sprintf("%+v", err), http.StatusInternalServerError)
 		return
@@ -130,8 +130,8 @@ func createForwardPath(servicePath, requestPath string) string {
 }
 
 // TODO refactor this out into a new module
-func getForwardURLForServiceRequest(upstream *models.Upstream, service *models.Service, path string) (*url.URL, error) {
-	childPath := createForwardPath(service.Path, path)
+func getForwardURLForServiceRequest(upstream *models.Upstream, service *models.Service, url *url.URL) (*url.URL, error) {
+	childPath := createForwardPath(service.Path, url.Path)
 	//request.RequestURI = childPath
 
 	// The built url we will forward to
@@ -142,6 +142,9 @@ func getForwardURLForServiceRequest(upstream *models.Upstream, service *models.S
 		upstreamURL = fmt.Sprintf("%s%s", upstream.URL, childPath)
 	}
 
+	if len(url.Query()) > 0 {
+		upstreamURL = fmt.Sprintf("%s?%s", upstreamURL, url.Query().Encode())
+	}
 	upstreamURL = strings.TrimPrefix(upstreamURL, "/")
 
 	url, err := url.Parse(upstreamURL)

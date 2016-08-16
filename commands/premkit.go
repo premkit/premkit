@@ -7,8 +7,8 @@ import (
 	"github.com/spf13/viper"
 )
 
-// PremKitCmd is the main (root) command for the CLI.
-var PremKitCmd = &cobra.Command{
+// PremkitCmd is the main (root) command for the CLI.
+var PremkitCmd = &cobra.Command{
 	Use:   "premkit",
 	Short: "premkit enables installable software",
 	Long:  "premkit is the reverse proxy, used to ship installable software",
@@ -24,18 +24,18 @@ var PremKitCmd = &cobra.Command{
 	},
 }
 
-// Execute adds all child commands to the room command PremKitCmd and sets flags
+// Execute adds all child commands to the room command PremkitCmd and sets flags
 func Execute() {
 	AddCommands()
 
-	if _, err := PremKitCmd.ExecuteC(); err != nil {
+	if _, err := PremkitCmd.ExecuteC(); err != nil {
 		os.Exit(-1)
 	}
 }
 
-// AddCommands will add all child commands to the PremKitCmd
+// AddCommands will add all child commands to the PremkitCmd
 func AddCommands() {
-	PremKitCmd.AddCommand(daemonCmd)
+	PremkitCmd.AddCommand(daemonCmd)
 }
 
 // InitializeConfig initializes the config environment with defaults.
