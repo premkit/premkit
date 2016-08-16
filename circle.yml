@@ -36,9 +36,9 @@ deployment:
     commands:
       - rm $HOME/src/github.com/premkit/premkit/Dockerfile
       - mv $HOME/src/github.com/premkit/premkit/deploy/Dockerfile $HOME/src/github.com/premkit/premkit/Dockerfile
-      - sudo docker build -t premkit/premkit:0.1.0 $HOME/src/github.com/premkit/premkit
+      - sudo docker build -t premkit/premkit:0.1.1 $HOME/src/github.com/premkit/premkit
       - sudo docker login -e $DOCKER_EMAIL -u $DOCKER_USER -p $DOCKER_PASS
-      - sudo docker push premkit/premkit:0.1.0
-      - sudo docker tag premkit/premkit:0.1.0 premkit/premkit:latest
+      - sudo docker push premkit/premkit:0.1.1
+      - sudo docker tag premkit/premkit:0.1.1 premkit/premkit:latest
       - sudo docker push premkit/premkit:latest
 

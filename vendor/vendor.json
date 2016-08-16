@@ -133,10 +133,22 @@
 			"revisionTime": "2016-02-12T03:18:39Z"
 		},
 		{
+			"checksumSHA1": "O7lIX71vTepwRVcnXbV3Fzq0z5U=",
+			"path": "github.com/moul/http2curl",
+			"revision": "b1479103caacaa39319f75e7f57fc545287fca0d",
+			"revisionTime": "2016-05-20T21:31:28Z"
+		},
+		{
 			"checksumSHA1": "BoXdUBWB8UnSlFlbnuTQaPqfCGk=",
 			"path": "github.com/op/go-logging",
 			"revision": "970db520ece77730c7e4724c61121037378659d9",
 			"revisionTime": "2016-03-15T20:05:05Z"
+		},
+		{
+			"checksumSHA1": "tL0pxXs1jWzOSnK30Ke+I7sc1CM=",
+			"path": "github.com/parnurzeal/gorequest",
+			"revision": "c4a74a6708c98dafe692472ca01d6390d6d2ab4e",
+			"revisionTime": "2016-03-12T08:54:32Z"
 		},
 		{
 			"checksumSHA1": "LuFv4/jlrmFNnDb/5SCSEPAM9vU=",
@@ -209,6 +221,18 @@
 			"path": "golang.org/x/net/context",
 			"revision": "ef2e00e88c5e0a3569f0bb9df697e9cbc6215fea",
 			"revisionTime": "2016-06-28T23:00:16Z"
+		},
+		{
+			"checksumSHA1": "GIGmSrYACByf5JDIP9ByBZksY80=",
+			"path": "golang.org/x/net/idna",
+			"revision": "07b51741c1d6423d4a6abab1c49940ec09cb1aaf",
+			"revisionTime": "2016-08-11T10:50:59Z"
+		},
+		{
+			"checksumSHA1": "6thYfOqbpn607QljSl+jOXbuqio=",
+			"path": "golang.org/x/net/publicsuffix",
+			"revision": "07b51741c1d6423d4a6abab1c49940ec09cb1aaf",
+			"revisionTime": "2016-08-11T10:50:59Z"
 		},
 		{
 			"checksumSHA1": "w/oQQFHCnE+S+2g5D62nfY8aDuQ=",
