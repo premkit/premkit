@@ -44,3 +44,15 @@ func TestCreateForwardPath(t *testing.T) {
 	forwardPath = createForwardPath(servicePath, requestPath)
 	assert.Equal(t, "/one/two", forwardPath)
 }
+
+func TestCreateForwardPathWithQuery(t *testing.T) {
+	servicePath := "service"
+	requestPath := "/service/something?a=b"
+	forwardPath := createForwardPath(servicePath, requestPath)
+	assert.Equal(t, "/something?a=b", forwardPath)
+
+	servicePath = "service/test/something"
+	requestPath = "/service/test/something/one/two?a=b"
+	forwardPath = createForwardPath(servicePath, requestPath)
+	assert.Equal(t, "/one/two?a=b", forwardPath)
+}
