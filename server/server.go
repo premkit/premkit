@@ -3,9 +3,10 @@ package server
 import (
 	"fmt"
 
+	"net/http"
+
 	"github.com/premkit/premkit/handlers/v1"
 	"github.com/premkit/premkit/log"
-	"net/http"
 
 	"github.com/gorilla/mux"
 )
@@ -36,4 +37,6 @@ func Run(config *Config) {
 			log.Error(http.ListenAndServeTLS(fmt.Sprintf(":%d", config.HTTPSPort), config.TLSCertFile, config.TLSKeyFile, router))
 		}()
 	}
+
+	<-make(chan struct{})
 }

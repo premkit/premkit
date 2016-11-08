@@ -1,4 +1,3 @@
-
 #!/bin/bash
 
 # This script tests multiple packages and creates a consolidated cover profile

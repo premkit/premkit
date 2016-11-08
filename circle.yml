@@ -5,6 +5,7 @@ machine:
     GOPATH: $HOME
     GO15VENDOREXPERIMENT: 1  # Because this is golang 1.5
     PREMKIT_DATA_FILE: /tmp/premkit.db
+    PREMKIT_TAG: 0.1.2
 
 checkout:
   post:
@@ -34,11 +35,9 @@ deployment:
     branch: master
     owner: premkit
     commands:
-      - rm $HOME/src/github.com/premkit/premkit/Dockerfile
-      - mv $HOME/src/github.com/premkit/premkit/deploy/Dockerfile $HOME/src/github.com/premkit/premkit/Dockerfile
-      - sudo docker build -t premkit/premkit:0.1.1 $HOME/src/github.com/premkit/premkit
+      - cd $HOME/src/github.com/premkit/premkit && make build_docker
+      - cd $HOME/src/github.com/premkit/premkit && PREMKIT_TAG=0.1.2 make package_docker
       - sudo docker login -e $DOCKER_EMAIL -u $DOCKER_USER -p $DOCKER_PASS
-      - sudo docker push premkit/premkit:0.1.1
-      - sudo docker tag premkit/premkit:0.1.1 premkit/premkit:latest
+      - sudo docker tag -f premkit/premkit:$PREMKIT_TAG premkit/premkit:latest
+      - sudo docker push premkit/premkit:$PREMKIT_TAG
       - sudo docker push premkit/premkit:latest
-

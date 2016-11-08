@@ -1,4 +1,3 @@
-
 FROM golang:1.6
 
 RUN go get -u github.com/kardianos/govendor # 149dead46a0b5ec0d44f36ab95b7077a049eb68b
