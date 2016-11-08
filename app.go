@@ -15,6 +15,4 @@ func init() {
 func main() {
 	runtime.GOMAXPROCS(runtime.NumCPU())
 	commands.Execute()
-
-	<-make(chan int)
 }

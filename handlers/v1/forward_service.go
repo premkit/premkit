@@ -12,6 +12,7 @@ import (
 	"github.com/premkit/premkit/log"
 	"github.com/premkit/premkit/models"
 
+	"github.com/Sirupsen/logrus"
 	"github.com/vulcand/oxy/forward"
 )
 
@@ -25,7 +26,8 @@ func init() {
 		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
 	}
 	insecureRoundTripper := forward.RoundTripper(insecureTransport)
-	f, err := forward.New(insecureRoundTripper)
+	logger := forward.Logger(logrus.StandardLogger())
+	f, err := forward.New(insecureRoundTripper, logger)
 	if err != nil {
 		log.Error(err)
 		os.Exit(1)
@@ -110,6 +112,7 @@ func ForwardService(response http.ResponseWriter, request *http.Request) {
 
 	if upstream.InsecureSkipVerify {
 		fwdInsecure.ServeHTTP(response, request)
+		return
 	}
 
 	fwdSecure.ServeHTTP(response, request)

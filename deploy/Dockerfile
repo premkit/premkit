@@ -1,14 +1,12 @@
-FROM debian:jessie
+FROM alpine:3.4
 
-RUN apt-get -y update && \
-    apt-get -y --no-install-recommends install ca-certificates && \
-    rm -rf /var/lib/apt/lists/*
+RUN apk add --no-cache \
+  ca-certificates
 
-EXPOSE 80 443
+ADD ./deploy/bin/premkit /usr/bin/premkit
 
 VOLUME ["/data"]
+EXPOSE 80 443
 
-ADD bin/premkit /premkit
-
-ENTRYPOINT ["/premkit"]
+ENTRYPOINT ["/usr/bin/premkit"]
 CMD ["daemon"]
