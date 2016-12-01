@@ -2,12 +2,11 @@ package server
 
 import (
 	"fmt"
+
 	"net/http"
 
 	"github.com/premkit/premkit/handlers/v1"
 	"github.com/premkit/premkit/log"
-
-	"github.com/replicatedcom/replicated/pkg/networking"
 
 	"github.com/gorilla/mux"
 )
@@ -35,12 +34,7 @@ func Run(config *Config) {
 	if config.HTTPSPort != 0 {
 		go func() {
 			log.Infof("Listening on port %d for https connections", config.HTTPSPort)
-			srv := &http.Server{
-				Addr:      fmt.Sprintf(":%d", config.HTTPSPort),
-				Handler:   router,
-				TLSConfig: networking.GetTLSConfig(nil),
-			}
-			log.Error(srv.ListenAndServeTLS(config.TLSCertFile, config.TLSKeyFile))
+			log.Error(http.ListenAndServeTLS(fmt.Sprintf(":%d", config.HTTPSPort), config.TLSCertFile, config.TLSKeyFile, router))
 		}()
 	}
 
