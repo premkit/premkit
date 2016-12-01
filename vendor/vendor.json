@@ -157,6 +157,12 @@
 			"revisionTime": "2016-01-10T10:55:54Z"
 		},
 		{
+			"checksumSHA1": "SW78NPjiSHH9R6vVqD3FC17JuEM=",
+			"path": "github.com/replicatedcom/replicated/pkg/networking",
+			"revision": "f09c603fa3fdf8f8b401e848a74d6819a637a0e5",
+			"revisionTime": "2016-12-01T01:25:04Z"
+		},
+		{
 			"checksumSHA1": "E1899TNqCHhCtr6+joW4YEldRuE=",
 			"path": "github.com/spf13/cast",
 			"revision": "27b586b42e29bec072fe7379259cc719e1289da6",
