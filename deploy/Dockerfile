@@ -5,8 +5,14 @@ RUN apk add --no-cache \
 
 ADD ./deploy/bin/premkit /usr/bin/premkit
 
-VOLUME ["/data"]
-EXPOSE 80 443
+EXPOSE 80 443 2080 2443
+
+# Set up required directories with permission
+RUN mkdir -p /data
+RUN chmod -R a+rw /data
+
+VOLUME /data
 
 ENTRYPOINT ["/usr/bin/premkit"]
+
 CMD ["daemon"]
