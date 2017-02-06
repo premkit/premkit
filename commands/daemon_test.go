@@ -87,8 +87,8 @@ func TestBuildConfigFromFile(t *testing.T) {
 	require.NoError(t, err)
 	assert.NotNil(t, config)
 	expectedConfig := server.Config{
-		HTTPPort:    80,
-		HTTPSPort:   443,
+		HTTPPort:    2080,
+		HTTPSPort:   2443,
 		TLSKeyFile:  path.Join(dirName, "key"),
 		TLSCertFile: path.Join(dirName, "cert"),
 	}

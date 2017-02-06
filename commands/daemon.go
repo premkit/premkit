@@ -12,8 +12,8 @@ import (
 )
 
 const (
-	defaultHTTPPort               = 80
-	defaultHTTPSPort              = 443
+	defaultHTTPPort               = 2080
+	defaultHTTPSPort              = 2443
 	defaultTLSKeyFile             = ""
 	defaultTLSCertFile            = ""
 	defaultGenerateSelfSignedCert = true
