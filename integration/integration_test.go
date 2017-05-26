@@ -87,7 +87,7 @@ func setup() error {
 		Send(registerParams).
 		End()
 	if len(errs) != 0 {
-		fmt.Printf("Unexpected errs from registering service: %#v", errs)
+		fmt.Printf("Unexpected errs from registering service: %+#v", errs)
 		os.Exit(1)
 	}
 	if resp.StatusCode != http.StatusCreated {
