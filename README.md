@@ -7,7 +7,7 @@ Dockerfiles to use if you want to build the binary.
 
 ## Build the development container
 ```shell
-$ docker build -t premkit/premkit:dev .
+$ make docker
 ```
 
 ## Run the development environment
