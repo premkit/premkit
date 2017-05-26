@@ -48,7 +48,7 @@ func setup() error {
 		TLSKeyFile:  "",
 		TLSCertFile: "",
 	}
-	server.Run(&config)
+	go server.Run(&config)
 
 	// Start a custom upstream echo server
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {

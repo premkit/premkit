@@ -1,17 +1,17 @@
-.PHONY: clean install test build run swagger-spec container shell build_docker package_docker all
+.PHONY: clean install test build run swagger-spec docker shell build_docker package_docker all
 
 clean:
-	rm -f ./bin/premkit ./deploy/bin/premkit
+	rm -rf ./bin ./deploy/bin
 
 install:
-	govendor install
+	govendor install +std +local +vendor,^program
 
 test:
 	govendor test +local
 
 build:
 	mkdir -p ./bin
-	govendor build -o ./bin/premkit .
+	go build -o ./bin/premkit .
 
 run:
 	./bin/premkit daemon
@@ -21,7 +21,7 @@ swagger-spec:
 	swagger generate spec -b github.com/premkit/premkit/handlers/v1 -o ./spec/v1/swagger.json
 	swagger validate ./spec/v1/swagger.json
 
-container:
+docker:
 	docker build -t premkit/premkit:dev .
 
 shell:
@@ -34,7 +34,7 @@ shell:
 
 build_docker:
 	mkdir -p ./package/bin
-	CGO_ENABLED=0 go build -a -installsuffix cgo --ldflags '-extldflags "-static"' -o ./deploy/bin/premkit .
+	go build -tags "netgo" --ldflags '-extldflags "-static"' -o ./deploy/bin/premkit .
 
 package_docker:
 	docker build -t premkit/premkit:$(PREMKIT_TAG) -f ./deploy/Dockerfile .

@@ -19,10 +19,10 @@
 			"revisionTime": "2016-06-01T11:32:10Z"
 		},
 		{
-			"checksumSHA1": "CIaQq8mfGNZbWy7kmDAJkXE+Xtc=",
+			"checksumSHA1": "J+kVue/HTH4sELlqMO4z0tx9DiA=",
 			"path": "github.com/boltdb/bolt",
-			"revision": "3f7947a25d970e1e5f512276c14d5dcf731ccd5e",
-			"revisionTime": "2016-06-16T19:33:16Z"
+			"revision": "e9cf4fae01b5a8ff89d0ec6b32f0d9c9f79aefdd",
+			"revisionTime": "2017-01-31T19:20:18Z"
 		},
 		{
 			"checksumSHA1": "5rPfda8jFccr3A6heL+JAmi9K9g=",
@@ -259,5 +259,5 @@
 			"revisionTime": "2016-03-01T20:40:22Z"
 		}
 	],
-	"rootPath": "github.com/premkit/premkit"
+	"rootPath": "premkit/premkit"
 }

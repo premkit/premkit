@@ -1,1 +1,120 @@
-{"consumes":["application/json"],"produces":["application/json"],"schemes":["https"],"swagger":"2.0","info":{"description":"The PremKit V1 service provides the load balancing service to dynamically\nroute requests to registered PremKit services.","title":"PremKit V1","contact":{"name":"Replicated, Inc.","url":"https://www.premkit.com","email":"code@premkit.com"},"version":"0.0.1"},"host":"localhost","basePath":"/v1","paths":{"/service":{"post":{"consumes":["application/json"],"produces":["application/json"],"schemes":["https"],"tags":["services"],"summary":"Registers a new backend service with the router.","operationId":"registerService","parameters":[{"x-go-name":"Service","description":"Service registration parameters.","name":"service","in":"body","schema":{"$ref":"#/definitions/Service"}}],"responses":{"201":{"$ref":"#/responses/registerServiceResponse"}}}}},"definitions":{"Service":{"type":"object","title":"Service represents a single registered service with this reverse proxy.","properties":{"name":{"type":"string","x-go-name":"Name"},"path":{"type":"string","x-go-name":"Path"},"registered":{"x-go-name":"Registered","$ref":"#/definitions/Time"},"upstreams":{"type":"array","items":{"type":"string"},"x-go-name":"Upstreams"}},"x-go-package":"github.com/premkit/premkit/models"},"Time":{"description":"Programs using times should typically store and pass them as values,\nnot pointers.  That is, time variables and struct fields should be of\ntype time.Time, not *time.Time.  A Time value can be used by\nmultiple goroutines simultaneously.\n\nTime instants can be compared using the Before, After, and Equal methods.\nThe Sub method subtracts two instants, producing a Duration.\nThe Add method adds a Time and a Duration, producing a Time.\n\nThe zero value of type Time is January 1, year 1, 00:00:00.000000000 UTC.\nAs this time is unlikely to come up in practice, the IsZero method gives\na simple way of detecting a time that has not been initialized explicitly.\n\nEach Time has associated with it a Location, consulted when computing the\npresentation form of the time, such as in the Format, Hour, and Year methods.\nThe methods Local, UTC, and In return a Time with a specific location.\nChanging the location in this way changes only the presentation; it does not\nchange the instant in time being denoted and therefore does not affect the\ncomputations described in earlier paragraphs.\n\nNote that the Go == operator compares not just the time instant but also the\nLocation. Therefore, Time values should not be used as map or database keys\nwithout first guaranteeing that the identical Location has been set for all\nvalues, which can be achieved through use of the UTC or Local method.","type":"object","title":"A Time represents an instant in time with nanosecond precision.","x-go-package":"time"}},"responses":{"registerServiceResponse":{"description":"RegisterServiceResponse represents the response to a registerService call. This response\nincludes a pointer to the registered service.","schema":{"$ref":"#/definitions/Service"}}}}
+{
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "schemes": [
+    "https"
+  ],
+  "swagger": "2.0",
+  "info": {
+    "description": "The PremKit V1 service provides the load balancing service to dynamically\nroute requests to registered PremKit services.",
+    "title": "PremKit V1",
+    "contact": {
+      "name": "Replicated, Inc.",
+      "url": "https://www.premkit.com",
+      "email": "code@premkit.com"
+    },
+    "version": "0.0.1"
+  },
+  "host": "localhost",
+  "basePath": "/v1",
+  "paths": {
+    "/service": {
+      "post": {
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "schemes": [
+          "https"
+        ],
+        "tags": [
+          "services"
+        ],
+        "summary": "Registers a new backend service with the router.",
+        "operationId": "registerService",
+        "parameters": [
+          {
+            "x-go-name": "Service",
+            "description": "Service registration parameters.",
+            "name": "service",
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/Service"
+            }
+          },
+          {
+            "type": "boolean",
+            "x-go-name": "ReplaceExisting",
+            "name": "replace_existing",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "201": {
+            "$ref": "#/responses/registerServiceResponse"
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "Service": {
+      "type": "object",
+      "title": "Service represents a single registered service with this reverse proxy.",
+      "properties": {
+        "name": {
+          "type": "string",
+          "x-go-name": "Name"
+        },
+        "path": {
+          "type": "string",
+          "x-go-name": "Path"
+        },
+        "registered": {
+          "x-go-name": "Registered"
+        },
+        "upstreams": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Upstream"
+          },
+          "x-go-name": "Upstreams"
+        }
+      },
+      "x-go-package": "github.com/premkit/premkit/models"
+    },
+    "Upstream": {
+      "type": "object",
+      "title": "Upstream represents a single upstream that will be added to a service.",
+      "properties": {
+        "include_service_path": {
+          "type": "boolean",
+          "x-go-name": "IncludeServicePath"
+        },
+        "insecure_skip_verify": {
+          "type": "boolean",
+          "x-go-name": "InsecureSkipVerify"
+        },
+        "url": {
+          "type": "string",
+          "x-go-name": "URL"
+        }
+      },
+      "x-go-package": "github.com/premkit/premkit/models"
+    }
+  },
+  "responses": {
+    "registerServiceResponse": {
+      "description": "RegisterServiceResponse represents the response to a registerService call. This response\nincludes a pointer to the registered service.",
+      "schema": {
+        "$ref": "#/definitions/Service"
+      }
+    }
+  }
+}
