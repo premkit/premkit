@@ -42,4 +42,3 @@ deployment:
       - sudo docker login -e $DOCKER_EMAIL -u $DOCKER_USER -p $DOCKER_PASS
       - sudo docker tag -f premkit/premkit:$PREMKIT_TAG premkit/premkit:latest
       - sudo docker push premkit/premkit:$PREMKIT_TAG
-      - sudo docker push premkit/premkit:latest
