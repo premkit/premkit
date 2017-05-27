@@ -3,9 +3,7 @@ machine:
     - docker
   environment:
     GOPATH: $HOME
-    GO15VENDOREXPERIMENT: 1  # Because this is golang 1.5
-    PREMKIT_DATA_FILE: /tmp/premkit.db
-    PREMKIT_TAG: 1.0.0
+    PREMKIT_TAG: $(echo $CIRCLE_SHA1 | cut -c -7)
 
 checkout:
   post:
@@ -13,22 +11,26 @@ checkout:
     - cp -r $HOME/premkit $HOME/src/github.com/premkit/premkit
 
 dependencies:
+  cache_directories:
+    - $HOME/pkg
+  pre:
+    - go get golang.org/x/tools/cmd/cover
+    - go get github.com/axw/gocov/gocov
+    - go get github.com/kardianos/govendor
+    - go get github.com/go-swagger/go-swagger/cmd/swagger
+    - go get github.com/mattn/goveralls
+    - go get github.com/go-playground/overalls
+    - cd $HOME/src/github.com/premkit/premkit && make install
   override:
-    - go get -u github.com/kardianos/govendor
-    - cd $HOME/src/github.com/premkit/premkit && make build
+    - cd $HOME/src/github.com/premkit/premkit && make build swagger-spec
   post:
     - cp $HOME/src/github.com/premkit/premkit/bin/premkit $CIRCLE_ARTIFACTS
 
 test:
-  pre:
-    - GOPATH=/tmp go get github.com/axw/gocov/gocov
-    - GOPATH=/tmp go get github.com/mattn/goveralls
-    - go get github.com/stretchr/testify/assert
-    - if ! GOPATH=/tmp go get github.com/golang/tools/cmd/cover; then GOPATH=/tmp go get golang.org/x/tools/cmd/cover; fi
   override:
-    - cd $HOME/src/github.com/premkit/premkit/test && ./coverage.bash ./packages.txt ./profile.cov
+    - overalls -project=github.com/premkit/premkit -covermode=count -ignore=vendor,integration -- -v
   post:
-    - /tmp/bin/goveralls -service=circle-ci -repotoken=$COVERALLS_REPO_TOKEN -coverprofile=$HOME/src/github.com/premkit/premkit/test/profile.cov
+    - goveralls -service=circle-ci -repotoken=${COVERALLS_REPO_TOKEN} -coverprofile=$HOME/src/github.com/premkit/premkit/overalls.coverprofile
 
 deployment:
   docker:
@@ -36,7 +38,7 @@ deployment:
     owner: premkit
     commands:
       - cd $HOME/src/github.com/premkit/premkit && make build_docker
-      - cd $HOME/src/github.com/premkit/premkit && PREMKIT_TAG=1.0.0 make package_docker
+      - cd $HOME/src/github.com/premkit/premkit && make package_docker
       - sudo docker login -e $DOCKER_EMAIL -u $DOCKER_USER -p $DOCKER_PASS
       - sudo docker tag -f premkit/premkit:$PREMKIT_TAG premkit/premkit:latest
       - sudo docker push premkit/premkit:$PREMKIT_TAG
