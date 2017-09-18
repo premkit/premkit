@@ -24,17 +24,22 @@ swagger-spec:
 docker:
 	docker build -t premkit/premkit:dev .
 
+docker_build:
+	docker build --rm=false -t premkit/premkit:build -f deploy/Dockerfile-build .
+
 shell:
 	docker run --rm -it -P --name premkit \
-	  -p 80:80 \
-	  -p 443:443 \
-	  -v `pwd`:/go/src/github.com/premkit/premkit \
-	  -v `pwd`/data:/data \
-	  premkit/premkit:dev
+		-p 80:80 \
+		-p 443:443 \
+		-v `pwd`:/go/src/github.com/premkit/premkit \
+		-v `pwd`/data:/data \
+		premkit/premkit:dev
 
 build_docker:
-	mkdir -p ./package/bin
-	go build -tags "netgo" --ldflags '-extldflags "-static"' -o ./deploy/bin/premkit .
+	mkdir -p ./deploy/bin
+	go build \
+		--ldflags '-extldflags "-static"' \
+		-o ./deploy/bin/premkit .
 
 package_docker:
 	docker build -t premkit/premkit:$(PREMKIT_TAG) -f ./deploy/Dockerfile .
