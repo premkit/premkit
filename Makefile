@@ -42,6 +42,6 @@ build_docker:
 		-o ./deploy/bin/premkit .
 
 package_docker:
-	docker build -t premkit/premkit:$(PREMKIT_TAG) -f ./deploy/Dockerfile .
+	docker build --rm=false -t premkit/premkit:$(PREMKIT_TAG) -f ./deploy/Dockerfile .
 
 all: build test
