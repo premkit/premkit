@@ -16,15 +16,24 @@ dependencies:
   pre:
     - go get golang.org/x/tools/cmd/cover
     - go get github.com/axw/gocov/gocov
-    - go get github.com/kardianos/govendor
     - go get github.com/go-swagger/go-swagger/cmd/swagger
     - go get github.com/mattn/goveralls
     - go get github.com/go-playground/overalls
-    - cd $HOME/src/github.com/premkit/premkit && make install
+    - make docker_build:
+      pwd:
+        $HOME/src/github.com/premkit/premkit
   override:
-    - cd $HOME/src/github.com/premkit/premkit && make build swagger-spec
+    - |
+      docker run --rm \
+        -v $HOME/src/github.com/premkit/premkit:/go/src/github.com/premkit/premkit \
+        premkit/premkit:build \
+        make build
+    - make swagger-spec:
+      pwd:
+        $HOME/src/github.com/premkit/premkit
   post:
     - cp $HOME/src/github.com/premkit/premkit/bin/premkit $CIRCLE_ARTIFACTS
+        
 
 test:
   override:
@@ -37,8 +46,14 @@ deployment:
     branch: master
     owner: premkit
     commands:
-      - cd $HOME/src/github.com/premkit/premkit && make build_docker
-      - cd $HOME/src/github.com/premkit/premkit && make package_docker
+      - |
+        docker run --rm \
+          -v $HOME/src/github.com/premkit/premkit:/go/src/github.com/premkit/premkit \
+          premkit/premkit:build \
+          make build_docker
+      - make package_docker:
+        pwd:
+          $HOME/src/github.com/premkit/premkit
       - sudo docker login -e $DOCKER_EMAIL -u $DOCKER_USER -p $DOCKER_PASS
       - sudo docker tag -f premkit/premkit:$PREMKIT_TAG premkit/premkit:latest
       - sudo docker push premkit/premkit:$PREMKIT_TAG
