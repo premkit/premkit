@@ -51,9 +51,7 @@ deployment:
           -v $HOME/src/github.com/premkit/premkit:/go/src/github.com/premkit/premkit \
           premkit/premkit:build \
           make build_docker
-      - make package_docker:
-        pwd:
-          $HOME/src/github.com/premkit/premkit
+      - cd $HOME/src/github.com/premkit/premkit && make package_docker
       - sudo docker login -e $DOCKER_EMAIL -u $DOCKER_USER -p $DOCKER_PASS
       - sudo docker tag -f premkit/premkit:$PREMKIT_TAG premkit/premkit:latest
       - sudo docker push premkit/premkit:$PREMKIT_TAG
