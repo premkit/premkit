@@ -9,6 +9,7 @@ checkout:
   post:
     - mkdir -p $HOME/src/github.com/premkit
     - cp -r $HOME/premkit $HOME/src/github.com/premkit/premkit
+    - mkdir -p $HOME/pkg
 
 dependencies:
   cache_directories:
