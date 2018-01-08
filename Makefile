@@ -41,6 +41,14 @@ build_docker:
 		--ldflags '-extldflags "-static"' \
 		-o ./deploy/bin/premkit .
 
+build_docker_local:
+	mkdir -p ./deploy/bin
+	docker run --rm -it \
+		-v `pwd`:/go/src/github.com/premkit/premkit \
+		premkit/premkit:build go build \
+			--ldflags '-extldflags "-static"' \
+			-o ./deploy/bin/premkit .
+
 package_docker:
 	docker build --rm=false -t premkit/premkit:$(PREMKIT_TAG) -f ./deploy/Dockerfile .
 
