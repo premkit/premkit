@@ -71,6 +71,7 @@ func RegisterService(response http.ResponseWriter, request *http.Request) {
 	if err != nil {
 		log.Error(err)
 		http.Error(response, fmt.Sprintf("%+v", err), http.StatusInternalServerError)
+		return
 	}
 
 	response.WriteHeader(http.StatusCreated)
