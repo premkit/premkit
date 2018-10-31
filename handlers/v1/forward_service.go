@@ -13,6 +13,7 @@ import (
 	"github.com/premkit/premkit/models"
 
 	"github.com/Sirupsen/logrus"
+	cleanhttp "github.com/hashicorp/go-cleanhttp"
 	"github.com/vulcand/oxy/forward"
 )
 
@@ -22,9 +23,8 @@ var (
 )
 
 func init() {
-	var insecureTransport http.RoundTripper = &http.Transport{
-		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
-	}
+	insecureTransport := cleanhttp.DefaultTransport()
+	insecureTransport.TLSClientConfig = &tls.Config{InsecureSkipVerify: true}
 	insecureRoundTripper := forward.RoundTripper(insecureTransport)
 	logger := forward.Logger(logrus.StandardLogger())
 	f, err := forward.New(insecureRoundTripper, logger)
@@ -34,9 +34,8 @@ func init() {
 	}
 	fwdInsecure = f
 
-	var secureTransport http.RoundTripper = &http.Transport{
-		TLSClientConfig: &tls.Config{InsecureSkipVerify: false},
-	}
+	secureTransport := cleanhttp.DefaultTransport()
+	secureTransport.TLSClientConfig = &tls.Config{InsecureSkipVerify: false}
 	secureRoundTripper := forward.RoundTripper(secureTransport)
 	f, err = forward.New(secureRoundTripper)
 	if err != nil {
