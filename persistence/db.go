@@ -3,6 +3,7 @@ package persistence
 import (
 	"os"
 	"path/filepath"
+	"sync"
 
 	"github.com/premkit/premkit/log"
 
@@ -12,10 +13,14 @@ import (
 
 // DB is the lazy-loaded reference to the BoltDB instance.  Use the GetDB() function to obtain this.
 var DB *bolt.DB
+var mu sync.Mutex
 
 // GetDB returns the singleton instance of the BoltDB connection.  This is not a threadsafe object,
 // but transactions are.  Any caller using this object should use a transaction.
 func GetDB() (*bolt.DB, error) {
+	mu.Lock()
+	defer mu.Unlock()
+
 	if DB != nil {
 		return DB, nil
 	}
