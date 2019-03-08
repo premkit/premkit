@@ -6,6 +6,7 @@ import (
 	"github.com/premkit/premkit/certs"
 	"github.com/premkit/premkit/log"
 	"github.com/premkit/premkit/server"
+	"github.com/premkit/premkit/version"
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -25,10 +26,10 @@ const (
 var daemonCmd = &cobra.Command{
 	Use:   "daemon",
 	Short: "A high performance reverse proxy",
-	Long: `PremKit is built around this high performance reverse proxy which supports 
-backend service automatic registration with namespacing.  
+	Long: `PremKit is built around this high performance reverse proxy which supports
+backend service automatic registration with namespacing.
 
-'premkit daemon' will start this reverse proxy and listen for requests for registrations 
+'premkit daemon' will start this reverse proxy and listen for requests for registrations
 and for requests to forward to backend services.`,
 }
 
@@ -56,6 +57,8 @@ func init() {
 }
 
 func daemon(cmd *cobra.Command, args []string) error {
+	log.Infof("Running version=%s, sha=%s, built with %s", version.Version(), version.GitSHA(), version.GoVersion())
+
 	if err := InitializeConfig(daemonCmd); err != nil {
 		return err
 	}

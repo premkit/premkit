@@ -3,7 +3,7 @@ FROM alpine:3.6
 RUN apk add --no-cache \
   ca-certificates
 
-ADD ./deploy/bin/premkit /usr/bin/premkit
+ADD ./bin/premkit /usr/bin/premkit
 
 EXPOSE 80 443 2080 2443
 

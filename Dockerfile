@@ -1,4 +1,4 @@
-FROM golang:1.9
+FROM golang:1.11
 
 RUN go get github.com/kardianos/govendor
 RUN go get github.com/go-swagger/go-swagger/cmd/swagger
