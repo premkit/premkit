@@ -13,6 +13,16 @@ build:
 	mkdir -p ./bin
 	go build -o ./bin/premkit .
 
+build_ci:
+	mkdir -p ./bin
+	GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -i \
+	--ldflags=" \
+	-X github.com/premkit/premkit/version.version=${PREMKIT_TAG} \
+	-X github.com/premkit/premkit/version.gitSHA=${BUILD_SHA} \
+	-X \"github.com/premkit/premkit/version.buildTime=$(shell date)\" \
+	" \
+	-o ./bin/premkit .
+
 run:
 	./bin/premkit daemon
 
