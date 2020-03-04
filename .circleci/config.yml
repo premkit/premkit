@@ -7,7 +7,7 @@ default_env: &default_env
 
 docker_build: &docker_build
   docker:
-    - image: circleci/golang:1.11
+    - image: circleci/golang:1.12
   working_directory: /go/src/github.com/premkit/premkit
   environment:
     <<: *default_env
@@ -24,7 +24,7 @@ jobs:
           name: Build Premkit
           command: |
             export BUILD_SHA=${CIRCLE_SHA1:0:7}
-            sudo -E PATH=$PATH  make build_ci
+            sudo -E PATH=$PATH make build_ci
       - run:
           name: Build Swagger Spec
           command: |
