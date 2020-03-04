@@ -1,11 +1,17 @@
 package log
 
 import (
+	"os"
+
 	log "github.com/Sirupsen/logrus"
 )
 
 func init() {
-	log.SetLevel(log.DebugLevel)
+	level, err := log.ParseLevel(os.Getenv("LOG_LEVEL"))
+	if err != nil {
+		level = log.InfoLevel
+	}
+	log.SetLevel(level)
 }
 
 // Debugf logs a message in sprintf format at debug level.
