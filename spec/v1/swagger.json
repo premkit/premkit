@@ -77,6 +77,8 @@
           "x-go-name": "Path"
         },
         "registered": {
+          "type": "string",
+          "format": "date-time",
           "x-go-name": "Registered"
         },
         "upstreams": {

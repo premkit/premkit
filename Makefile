@@ -28,7 +28,7 @@ run:
 
 swagger-spec:
 	mkdir -p ./spec/v1
-	swagger generate spec -b github.com/premkit/premkit/handlers/v1 -o ./spec/v1/swagger.json
+	swagger generate spec -w ./handlers/v1 -o ./spec/v1/swagger.json  ./...
 	swagger validate ./spec/v1/swagger.json
 
 docker:

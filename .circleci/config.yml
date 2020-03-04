@@ -25,6 +25,7 @@ jobs:
           command: |
             export BUILD_SHA=${CIRCLE_SHA1:0:7}
             sudo -E PATH=$PATH make build_ci
+            sudo chown -R circleci:circleci /home/circleci/.cache/
       - run:
           name: Build Swagger Spec
           command: |
