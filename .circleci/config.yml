@@ -18,7 +18,6 @@ jobs:
     <<: *docker_build
     steps:
       - checkout
-      - setup_remote_docker
       - run:
           name: Build Premkit
           command: |
@@ -45,7 +44,7 @@ jobs:
             - bin
             - spec
 
-  build_and_deploy:
+  push:
     <<: *docker_build
     steps:
       - checkout
