@@ -1,46 +1,51 @@
-.PHONY: clean install test build run swagger-spec docker shell build_docker package_docker all
+.PHONY: clean install test build run swagger-spec docker shell package_docker all
 
-ifeq ($(PREMKIT_TAG),)
-PREMKIT_TAG := 0.0.0
+ifeq ($(BUILD_VERSION),)
+BUILD_VERSION := 0.0.1
 endif
 
+.PHONY: clean
 clean:
 	rm -rf ./bin ./deploy/bin
 
+.PHONY: install
 install:
 	govendor install +std +local +vendor,^program
 
+.PHONY: test
 test:
 	govendor test +local
 
+.PHONY: build
 build:
 	mkdir -p ./bin
-	go build -o ./bin/premkit .
 
+.PHONY: build_ci
 build_ci:
 	mkdir -p ./bin
 	GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -i \
 	--ldflags=" \
-	-X github.com/premkit/premkit/version.version=${PREMKIT_TAG} \
+	-X github.com/premkit/premkit/version.version=$(BUILD_VERSION) \
 	-X github.com/premkit/premkit/version.gitSHA=${BUILD_SHA} \
 	-X \"github.com/premkit/premkit/version.buildTime=$(shell date)\" \
 	" \
 	-o ./bin/premkit .
 
+.PHONY: run
 run:
 	./bin/premkit daemon
 
-swagger-spec:
+.PHONY: swagger_spec
+swagger_spec:
 	mkdir -p ./spec/v1
 	swagger generate spec -w ./handlers/v1 -o ./spec/v1/swagger.json  ./...
 	swagger validate ./spec/v1/swagger.json
 
+.PHONY: docker
 docker:
 	docker build -t premkit/premkit:dev .
 
-docker_build:
-	docker build --rm=false -t premkit/premkit:build -f deploy/Dockerfile-build .
-
+.PHONY: shell
 shell:
 	docker run --rm -it -P --name premkit \
 		-p 80:80 \
@@ -49,21 +54,5 @@ shell:
 		-v `pwd`/data:/data \
 		premkit/premkit:dev
 
-build_docker:
-	mkdir -p ./deploy/bin
-	go build \
-		--ldflags '-extldflags "-static"' \
-		-o ./deploy/bin/premkit .
-
-build_docker_local:
-	mkdir -p ./deploy/bin
-	docker run --rm -it \
-		-v `pwd`:/go/src/github.com/premkit/premkit \
-		premkit/premkit:build go build \
-			--ldflags '-extldflags "-static"' \
-			-o ./deploy/bin/premkit .
-
-package_docker:
-	docker build --rm=false -t premkit/premkit:$(PREMKIT_TAG) -f ./deploy/Dockerfile .
-
-all: build test
+.PHONY: all
+all: build swagger_spec test

@@ -23,14 +23,14 @@ jobs:
           name: Build Premkit
           command: |
             export BUILD_SHA=${CIRCLE_SHA1:0:7}
-            export PREMKIT_TAG=${CIRCLE_TAG}
+            export BUILD_VERSION=${CIRCLE_TAG//v}
             sudo -E PATH=$PATH make build_ci
             sudo chown -R circleci:circleci /home/circleci/.cache/
       - run:
           name: Build Swagger Spec
           command: |
             go get github.com/go-swagger/go-swagger/cmd/swagger
-            make swagger-spec
+            make swagger_spec
       - run:
           name: Run Overalls
           command: |
@@ -45,7 +45,7 @@ jobs:
             - bin
             - spec
 
-  push:
+  build_and_deploy:
     <<: *docker_build
     steps:
       - checkout
@@ -56,12 +56,11 @@ jobs:
           name: Build image
           command: |
             docker build --no-cache --pull -t registry.replicated.com/library/premkit:$CIRCLE_TAG -f ./deploy/Dockerfile .
-
-      - run:
-          name: Push the image
-          command: |
-            docker login -u $LIBRARY_TOKEN -p $LIBRARY_PASSWORD registry.replicated.com
-            docker push registry.replicated.com/library/premkit:$CIRCLE_TAG
+      # - run:
+      #     name: Push the image
+      #     command: |
+      #       docker login -u $LIBRARY_TOKEN -p $LIBRARY_PASSWORD registry.replicated.com
+      #       docker push registry.replicated.com/library/premkit:$CIRCLE_TAG
 
 
 workflows:
