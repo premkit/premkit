@@ -25,6 +25,10 @@ jobs:
             export BUILD_VERSION=${CIRCLE_TAG//v}
             sudo -E PATH=$PATH make build_ci
             sudo chown -R circleci:circleci /home/circleci/.cache/
+      - persist_to_workspace:
+          root: .
+          paths:
+            - bin
 
   test:
     <<: *docker_build
@@ -38,12 +42,6 @@ jobs:
             overalls -project=github.com/premkit/premkit -covermode=count -ignore=vendor,integration -- -v
             goveralls -service=circle-ci -repotoken=${COVERALLS_REPO_TOKEN} -coverprofile=overalls.coverprofile
 
-      - persist_to_workspace:
-          root: .
-          paths:
-            - bin
-            - spec
-
   spec:
     <<: *docker_build
     steps:
@@ -53,6 +51,10 @@ jobs:
           command: |
             go get github.com/go-swagger/go-swagger/cmd/swagger
             make swagger_spec
+      - persist_to_workspace:
+          root: .
+          paths:
+            - spec
 
   push:
     <<: *docker_build
