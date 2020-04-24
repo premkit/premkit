@@ -65,11 +65,11 @@ jobs:
           name: Build image
           command: |
             docker build --no-cache --pull -t registry.replicated.com/library/premkit:$CIRCLE_TAG -f ./deploy/Dockerfile .
-      # - run:
-      #     name: Push the image
-      #     command: |
-      #       docker login -u $LIBRARY_TOKEN -p $LIBRARY_PASSWORD registry.replicated.com
-      #       docker push registry.replicated.com/library/premkit:$CIRCLE_TAG
+      - deploy:
+          name: Push the image
+          command: |
+            docker login -u $LIBRARY_TOKEN -p $LIBRARY_PASSWORD registry.replicated.com
+            docker push registry.replicated.com/library/premkit:$CIRCLE_TAG
 
 
 workflows:
