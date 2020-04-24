@@ -1,7 +1,8 @@
 FROM debian:stretch-slim
 
-RUN apk add --no-cache \
-  ca-certificates
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    ca-certificates \
+  && rm -rf /var/lib/apt/lists/*
 
 ADD ./bin/premkit /usr/bin/premkit
 
