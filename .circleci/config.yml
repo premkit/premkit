@@ -55,7 +55,7 @@ jobs:
       - run:
           name: Build image
           command: |
-            docker build -t registry.replicated.com/library/premkit:$PREMKIT_TAG -f ./deploy/Dockerfile .
+            docker build --no-cache --pull -t registry.replicated.com/library/premkit:$PREMKIT_TAG -f ./deploy/Dockerfile .
 
       - run:
           name: Push the image
