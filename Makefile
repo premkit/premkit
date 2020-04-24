@@ -1,5 +1,7 @@
 .PHONY: clean install test build run swagger-spec docker shell build_docker package_docker all
 
+PREMKIT_TAG ?= 0.0.0
+
 clean:
 	rm -rf ./bin ./deploy/bin
 
