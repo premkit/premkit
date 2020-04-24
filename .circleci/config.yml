@@ -18,19 +18,22 @@ jobs:
     <<: *docker_build
     steps:
       - checkout
-      - setup_remote_docker
       - run:
           name: Build Premkit
           command: |
             export BUILD_SHA=${CIRCLE_SHA1:0:7}
-            export PREMKIT_TAG=${CIRCLE_TAG}
+            export BUILD_VERSION=${CIRCLE_TAG//v}
             sudo -E PATH=$PATH make build_ci
             sudo chown -R circleci:circleci /home/circleci/.cache/
-      - run:
-          name: Build Swagger Spec
-          command: |
-            go get github.com/go-swagger/go-swagger/cmd/swagger
-            make swagger-spec
+      - persist_to_workspace:
+          root: .
+          paths:
+            - bin
+
+  test:
+    <<: *docker_build
+    steps:
+      - checkout
       - run:
           name: Run Overalls
           command: |
@@ -39,10 +42,18 @@ jobs:
             overalls -project=github.com/premkit/premkit -covermode=count -ignore=vendor,integration -- -v
             goveralls -service=circle-ci -repotoken=${COVERALLS_REPO_TOKEN} -coverprofile=overalls.coverprofile
 
+  spec:
+    <<: *docker_build
+    steps:
+      - checkout
+      - run:
+          name: Build Swagger Spec
+          command: |
+            go get github.com/go-swagger/go-swagger/cmd/swagger
+            make swagger_spec
       - persist_to_workspace:
           root: .
           paths:
-            - bin
             - spec
 
   push:
@@ -56,8 +67,7 @@ jobs:
           name: Build image
           command: |
             docker build --no-cache --pull -t registry.replicated.com/library/premkit:$CIRCLE_TAG -f ./deploy/Dockerfile .
-
-      - run:
+      - deploy:
           name: Push the image
           command: |
             docker login -u $LIBRARY_TOKEN -p $LIBRARY_PASSWORD registry.replicated.com
@@ -73,6 +83,14 @@ workflows:
           filters:
             branches:
               ignore: master
+      - test:
+          filters:
+            branches:
+              ignore: master
+      - spec:
+          filters:
+            branches:
+              ignore: master
 
   deploy:
     jobs:
@@ -82,9 +100,23 @@ workflows:
               only: /^v[0-9]+(\.[0-9]+)*(-.*)*/
             branches:
               ignore: /.*/
+      - test:
+          filters:
+            tags:
+              only: /^v[0-9]+(\.[0-9]+)*(-.*)*/
+            branches:
+              ignore: /.*/
+      - spec:
+          filters:
+            tags:
+              only: /^v[0-9]+(\.[0-9]+)*(-.*)*/
+            branches:
+              ignore: /.*/
       - push:
           requires:
             - build
+            - test
+            - spec
           filters:
             tags:
               only: /^v[0-9]+(\.[0-9]+)*(-.*)*/
