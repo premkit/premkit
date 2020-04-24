@@ -25,11 +25,11 @@ jobs:
             export BUILD_VERSION=${CIRCLE_TAG//v}
             sudo -E PATH=$PATH make build_ci
             sudo chown -R circleci:circleci /home/circleci/.cache/
-      - run:
-          name: Build Swagger Spec
-          command: |
-            go get github.com/go-swagger/go-swagger/cmd/swagger
-            make swagger_spec
+
+  test:
+    <<: *docker_build
+    steps:
+      - checkout
       - run:
           name: Run Overalls
           command: |
@@ -43,6 +43,16 @@ jobs:
           paths:
             - bin
             - spec
+
+  spec:
+    <<: *docker_build
+    steps:
+      - checkout
+      - run:
+          name: Build Swagger Spec
+          command: |
+            go get github.com/go-swagger/go-swagger/cmd/swagger
+            make swagger_spec
 
   push:
     <<: *docker_build
@@ -71,6 +81,14 @@ workflows:
           filters:
             branches:
               ignore: master
+      - test:
+          filters:
+            branches:
+              ignore: master
+      - spec:
+          filters:
+            branches:
+              ignore: master
 
   deploy:
     jobs:
@@ -80,9 +98,23 @@ workflows:
               only: /^v[0-9]+(\.[0-9]+)*(-.*)*/
             branches:
               ignore: /.*/
+      - test:
+          filters:
+            tags:
+              only: /^v[0-9]+(\.[0-9]+)*(-.*)*/
+            branches:
+              ignore: /.*/
+      - spec:
+          filters:
+            tags:
+              only: /^v[0-9]+(\.[0-9]+)*(-.*)*/
+            branches:
+              ignore: /.*/
       - push:
           requires:
             - build
+            - test
+            - spec
           filters:
             tags:
               only: /^v[0-9]+(\.[0-9]+)*(-.*)*/
