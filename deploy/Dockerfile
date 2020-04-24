@@ -1,4 +1,4 @@
-FROM alpine:3.11
+FROM debian:stretch-slim
 
 RUN apk add --no-cache \
   ca-certificates

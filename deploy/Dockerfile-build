@@ -1,8 +1,4 @@
-FROM golang:1.12-alpine
-
-RUN apk update && apk add --no-cache \
-    gcc \
-    make
+FROM golang:1.12
 
 WORKDIR /go/src/github.com/premkit/premkit
 
