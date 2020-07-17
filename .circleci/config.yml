@@ -6,7 +6,7 @@ default_env: &default_env
 
 docker_build: &docker_build
   docker:
-    - image: circleci/golang:1.12
+    - image: circleci/golang:1.14
   working_directory: /go/src/github.com/premkit/premkit
   environment:
     <<: *default_env
