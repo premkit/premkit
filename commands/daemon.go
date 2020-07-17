@@ -70,8 +70,7 @@ func daemon(cmd *cobra.Command, args []string) error {
 
 	showAppliedSettings()
 
-	server.Run(config)
-	return nil
+	return server.Run(config)
 }
 
 func buildConfig() (*server.Config, error) {

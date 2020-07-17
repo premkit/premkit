@@ -8,7 +8,6 @@ import (
 	"crypto/x509"
 	"crypto/x509/pkix"
 	"encoding/pem"
-	"errors"
 	"fmt"
 	"io/ioutil"
 	"math/big"
@@ -149,21 +148,9 @@ func ParseKeyPair(keyFile string, certFile string) error {
 	}
 
 	// Validate this is an accepted key and cert
-	block, _ := pem.Decode([]byte(certData))
-	if block == nil {
-		err := errors.New("No pem encoded certificate data found")
+	if _, err := tls.X509KeyPair(certData, keyData); err != nil {
 		log.Error(err)
 		return err
 	}
-	_, err = x509.ParseCertificate(block.Bytes)
-	if err != nil {
-		log.Error(err)
-		return err
-	}
-	if _, err := tls.X509KeyPair([]byte(certData), []byte(keyData)); err != nil {
-		log.Error(err)
-		return err
-	}
-
 	return nil
 }

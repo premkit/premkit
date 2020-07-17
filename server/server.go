@@ -1,10 +1,11 @@
 package server
 
 import (
+	"crypto/tls"
 	"fmt"
 	"net/http"
 
-	"github.com/premkit/premkit/handlers/v1"
+	v1 "github.com/premkit/premkit/handlers/v1"
 	"github.com/premkit/premkit/log"
 
 	"github.com/replicatedcom/replicated/pkg/networking"
@@ -13,7 +14,7 @@ import (
 )
 
 // Run is the main entrypoint of this daemon.
-func Run(config *Config) {
+func Run(config *Config) error {
 	router := mux.NewRouter()
 
 	internal := router.PathPrefix("/premkit").Subrouter()
@@ -32,17 +33,24 @@ func Run(config *Config) {
 		}()
 	}
 
+	pair, err := tls.LoadX509KeyPair(config.TLSCertFile, config.TLSKeyFile)
+	if err != nil {
+		log.Errorf("Failed to load x509 key pair: %v", err)
+		return err
+	}
+
 	if config.HTTPSPort != 0 {
 		go func() {
 			log.Infof("Listening on port %d for https connections", config.HTTPSPort)
 			srv := &http.Server{
 				Addr:      fmt.Sprintf(":%d", config.HTTPSPort),
 				Handler:   router,
-				TLSConfig: networking.GetTLSConfig(nil),
+				TLSConfig: networking.GetTLSConfig([]tls.Certificate{pair}),
 			}
-			log.Error(srv.ListenAndServeTLS(config.TLSCertFile, config.TLSKeyFile))
+			log.Error(srv.ListenAndServeTLS("", ""))
 		}()
 	}
 
 	<-make(chan struct{})
+	return nil
 }
