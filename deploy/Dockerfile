@@ -2,6 +2,9 @@ FROM debian:buster-slim
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
     ca-certificates \
+    \
+    \
+    libp11-kit0 \
   && rm -rf /var/lib/apt/lists/*
 
 ADD ./bin/premkit /usr/bin/premkit
