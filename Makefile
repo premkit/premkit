@@ -1,4 +1,4 @@
-.PHONY: clean install test build run swagger-spec docker shell package_docker all
+.PHONY: clean test build run swagger-spec docker shell package_docker all
 
 ifeq ($(BUILD_VERSION),)
 BUILD_VERSION := 0.0.1
@@ -8,22 +8,14 @@ endif
 clean:
 	rm -rf ./bin ./deploy/bin
 
-.PHONY: install
-install:
-	govendor install +std +local +vendor,^program
-
 .PHONY: test
 test:
-	govendor test +local
+	go test ./...
 
 .PHONY: build
 build:
 	mkdir -p ./bin
-
-.PHONY: build_ci
-build_ci:
-	mkdir -p ./bin
-	GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -i \
+	GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build \
 	--ldflags=" \
 	-X github.com/premkit/premkit/version.version=$(BUILD_VERSION) \
 	-X github.com/premkit/premkit/version.gitSHA=${BUILD_SHA} \

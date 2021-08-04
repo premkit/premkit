@@ -1,6 +1,5 @@
-FROM golang:1.14
+FROM golang:1.16
 
-RUN go get github.com/kardianos/govendor
 RUN go get github.com/go-swagger/go-swagger/cmd/swagger
 
 ENV PROJECTPATH=/go/src/github.com/premkit/premkit

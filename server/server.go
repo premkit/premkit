@@ -5,12 +5,9 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/gorilla/mux"
 	v1 "github.com/premkit/premkit/handlers/v1"
 	"github.com/premkit/premkit/log"
-
-	"github.com/replicatedcom/replicated/pkg/networking"
-
-	"github.com/gorilla/mux"
 )
 
 // Run is the main entrypoint of this daemon.
@@ -45,7 +42,7 @@ func Run(config *Config) error {
 			srv := &http.Server{
 				Addr:      fmt.Sprintf(":%d", config.HTTPSPort),
 				Handler:   router,
-				TLSConfig: networking.GetTLSConfig([]tls.Certificate{pair}),
+				TLSConfig: getTLSConfig([]tls.Certificate{pair}),
 			}
 			log.Error(srv.ListenAndServeTLS("", ""))
 		}()
@@ -53,4 +50,19 @@ func Run(config *Config) error {
 
 	<-make(chan struct{})
 	return nil
+}
+
+func getTLSConfig(certs []tls.Certificate) *tls.Config {
+	return &tls.Config{
+		MinVersion:               tls.VersionTLS12,
+		CurvePreferences:         []tls.CurveID{tls.CurveP521, tls.CurveP384, tls.CurveP256},
+		PreferServerCipherSuites: true,
+		CipherSuites: []uint16{
+			tls.TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384,
+			tls.TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256,
+			tls.TLS_RSA_WITH_AES_256_GCM_SHA384,
+			tls.TLS_RSA_WITH_AES_256_CBC_SHA,
+		},
+		Certificates: certs,
+	}
 }
