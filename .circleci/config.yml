@@ -57,7 +57,7 @@ jobs:
             - spec
 
   push:
-    <<: *docker_build
+    executor: anchore/anchore_engine
     steps:
       - checkout
       - setup_remote_docker
