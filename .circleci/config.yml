@@ -1,4 +1,7 @@
-version: 2
+version: 2.1
+
+orbs:
+  anchore: anchore/anchore-engine@1
 
 default_env: &default_env
   PROJECT_NAME: premkit
@@ -6,7 +9,7 @@ default_env: &default_env
 
 docker_build: &docker_build
   docker:
-    - image: circleci/golang:1.14
+    - image: circleci/golang:1.16
   working_directory: /go/src/github.com/premkit/premkit
   environment:
     <<: *default_env
@@ -23,7 +26,7 @@ jobs:
           command: |
             export BUILD_SHA=${CIRCLE_SHA1:0:7}
             export BUILD_VERSION=${CIRCLE_TAG//v}
-            sudo -E PATH=$PATH make build_ci
+            sudo -E PATH=$PATH make build
             sudo chown -R circleci:circleci /home/circleci/.cache/
       - persist_to_workspace:
           root: .
@@ -35,12 +38,9 @@ jobs:
     steps:
       - checkout
       - run:
-          name: Run Overalls
+          name: Run go tests
           command: |
-            go get github.com/mattn/goveralls
-            go get github.com/go-playground/overalls
-            overalls -project=github.com/premkit/premkit -covermode=count -ignore=vendor,integration -- -v
-            goveralls -service=circle-ci -repotoken=${COVERALLS_REPO_TOKEN} -coverprofile=overalls.coverprofile
+            make test
 
   spec:
     <<: *docker_build
@@ -66,13 +66,42 @@ jobs:
       - run:
           name: Build image
           command: |
-            docker build --no-cache --pull -t registry.replicated.com/library/premkit:$CIRCLE_TAG -f ./deploy/Dockerfile .
+            docker build --pull -t registry.replicated.com/library/premkit:$CIRCLE_TAG -f ./deploy/Dockerfile .
+      - anchore/analyze_local_image:
+          dockerfile_path: ./deploy/Dockerfile
+          image_name: registry.replicated.com/library/premkit:$CIRCLE_TAG
+          policy_bundle_file_path: .circleci/.anchore/policy_bundle.json
+          policy_failure: true
+          timeout: '500'
+      - anchore/parse_reports
+      - store_artifacts:
+          path: anchore-reports
       - deploy:
           name: Push the image
           command: |
             docker login -u $LIBRARY_TOKEN -p $LIBRARY_PASSWORD registry.replicated.com
             docker push registry.replicated.com/library/premkit:$CIRCLE_TAG
 
+  local_image_scan:
+    executor: anchore/anchore_engine
+    steps:
+      - checkout
+      - setup_remote_docker
+      - attach_workspace:
+          at: .
+      - run:
+          name: Build image
+          command: |
+            docker build --pull -t registry.replicated.com/library/premkit:local -f ./deploy/Dockerfile .
+      - anchore/analyze_local_image:
+          dockerfile_path: ./deploy/Dockerfile
+          image_name: registry.replicated.com/library/premkit:local
+          policy_bundle_file_path: .circleci/.anchore/policy_bundle.json
+          policy_failure: true
+          timeout: '500'
+      - anchore/parse_reports
+      - store_artifacts:
+          path: anchore-reports
 
 workflows:
   version: 2
@@ -88,6 +117,12 @@ workflows:
             branches:
               ignore: master
       - spec:
+          filters:
+            branches:
+              ignore: master
+      - local_image_scan:
+          requires:
+            - build
           filters:
             branches:
               ignore: master
