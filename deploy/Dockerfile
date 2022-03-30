@@ -5,6 +5,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     \
     \
     libp11-kit0 \
+    libgmp10 \
   && rm -rf /var/lib/apt/lists/*
 
 ADD ./bin/premkit /usr/bin/premkit
