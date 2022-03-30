@@ -1,7 +1,7 @@
 version: 2.1
 
 orbs:
-  anchore: anchore/anchore-engine@1
+  anchore: anchore/anchore-engine@1.9.0
 
 default_env: &default_env
   PROJECT_NAME: premkit
@@ -76,12 +76,12 @@ jobs:
       - anchore/parse_reports
       - store_artifacts:
           path: anchore-reports
-      - deploy:
-          name: Push the image
-          command: |
-            docker login -u $LIBRARY_TOKEN -p $LIBRARY_PASSWORD registry.replicated.com
-            docker tag registry.replicated.com/library/premkit:local registry.replicated.com/library/premkit:$CIRCLE_TAG
-            docker push registry.replicated.com/library/premkit:$CIRCLE_TAG
+      # - deploy:
+      #     name: Push the image
+      #     command: |
+      #       docker login -u $LIBRARY_TOKEN -p $LIBRARY_PASSWORD registry.replicated.com
+      #       docker tag registry.replicated.com/library/premkit:local registry.replicated.com/library/premkit:$CIRCLE_TAG
+      #       docker push registry.replicated.com/library/premkit:$CIRCLE_TAG
 
   local_image_scan:
     executor: anchore/anchore_engine
@@ -127,6 +127,12 @@ workflows:
           filters:
             branches:
               ignore: master
+      - push:
+          requires:
+            - build
+          filters:
+            branches:
+              ignore: master              
 
   deploy:
     jobs:
