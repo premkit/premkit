@@ -2,7 +2,7 @@ Premkit [![CircleCI](https://circleci.com/gh/premkit/premkit.svg?style=svg)](htt
 =======
 
 ## Setup
-We use Docker for the official build environment.  Docker is not required to run the binary, but to simplify the development and build enviroment, there are 
+We use Docker for the official build environment.  Docker is not required to run the binary, but to simplify the development and build environment, there are 
 Dockerfiles to use if you want to build the binary.
 
 ## Build the development container
@@ -12,7 +12,7 @@ $ make docker
 
 ## Run the development environment
 
-### Start the container, build the execuatable, and run the service.
+### Start the container, build the executable, and run the service.
 ```
 $ make shell
 $ make build run
