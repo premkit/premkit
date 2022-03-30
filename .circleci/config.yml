@@ -95,7 +95,7 @@ jobs:
           command: |
             docker build --pull -t registry.replicated.com/library/premkit:local -f ./deploy/Dockerfile .
       - anchore/analyze_local_image:
-          anchore_version: 'a76306c0aed7e9e1e06efd327ce5540e0aae4970e5ac40a0fafe59dbeb6a9de3'
+          anchore_version: 'latest'
           dockerfile_path: ./deploy/Dockerfile
           image_name: registry.replicated.com/library/premkit:local
           policy_bundle_file_path: .circleci/.anchore/policy_bundle.json
