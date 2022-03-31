@@ -28,5 +28,5 @@ require (
 	github.com/stretchr/testify v1.2.3-0.20181014000028-04af85275a5c
 	github.com/vulcand/oxy v0.0.0-20160623194703-40720199a16c
 	gopkg.in/check.v1 v1.0.0-20201130134442-10cb98267c6c // indirect
-	gopkg.in/yaml.v2 v2.0.0-20160301204022-a83829b6f129 // indirect
+	gopkg.in/yaml.v2 v2.2.8 // indirect
 )
