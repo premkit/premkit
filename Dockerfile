@@ -1,6 +1,6 @@
-FROM golang:1.16
+FROM golang:1.20
 
-RUN go get github.com/go-swagger/go-swagger/cmd/swagger
+RUN go install github.com/go-swagger/go-swagger/cmd/swagger@latest
 
 ENV PROJECTPATH=/go/src/github.com/premkit/premkit
 ENV PATH $PATH:$PROJECTPATH/go/bin
