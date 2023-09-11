@@ -24,3 +24,15 @@ Tests are automatically run in CircleCI after pushing.  Tests can be run manuall
 $ make shell
 $ make test
 ```
+
+## Scanning image prior to release
+
+```
+make scan
+```
+
+## Making a release
+
+git tag and push
+
+Current release tag can be found in this repo's tag list as well as in the latest [Replicated](https://github.com/replicatedcom/replicated/blob/fd6175faad47e9a990abe825e523fbda0301043c/pkg/projects/replicated/pkg/replicatedcomponents/defaults/replicatedcomponents.go#L10) code

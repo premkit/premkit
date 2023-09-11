@@ -37,6 +37,14 @@ swagger_spec:
 docker:
 	docker build -t premkit/premkit:dev .
 
+grype-install:
+	curl -sSfL https://raw.githubusercontent.com/anchore/grype/main/install.sh | sh -s -- -b .
+
+scan: IMAGE=registry.replicated.com/library/premkit:local
+scan: build grype-install
+	docker build --pull -t ${IMAGE} -f ./deploy/Dockerfile .
+	./grype --fail-on=medium --only-fixed -vv ${IMAGE}
+
 .PHONY: shell
 shell:
 	docker run --rm -it -P --name premkit \
