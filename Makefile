@@ -43,7 +43,7 @@ grype-install:
 scan: IMAGE=registry.replicated.com/library/premkit:local
 scan: build grype-install
 	docker build --pull -t ${IMAGE} -f ./deploy/Dockerfile .
-	./grype --fail-on=medium --only-fixed -vv ${IMAGE}
+	./grype --fail-on=medium --only-fixed --config=.circleci/.anchore/grype.yaml -vv ${IMAGE}
 
 .PHONY: shell
 shell:
