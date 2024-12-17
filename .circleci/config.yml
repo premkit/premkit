@@ -45,7 +45,7 @@ jobs:
       - run:
           name: Build Swagger Spec
           command: |
-            go install github.com/go-swagger/go-swagger/cmd/swagger@v0.30.5
+            go install github.com/go-swagger/go-swagger/cmd/swagger@v0.31.0
             make swagger_spec
       - persist_to_workspace:
           root: .
