@@ -6,7 +6,7 @@ default_env: &default_env
 
 docker_build: &docker_build
   docker:
-    - image: cimg/go:1.19
+    - image: cimg/go:1.23
   environment:
     <<: *default_env
 
@@ -45,7 +45,7 @@ jobs:
       - run:
           name: Build Swagger Spec
           command: |
-            go install github.com/go-swagger/go-swagger/cmd/swagger@v0.30.5
+            go install github.com/go-swagger/go-swagger/cmd/swagger@v0.31.0
             make swagger_spec
       - persist_to_workspace:
           root: .
