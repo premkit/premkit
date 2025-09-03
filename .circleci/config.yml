@@ -6,7 +6,7 @@ default_env: &default_env
 
 docker_build: &docker_build
   docker:
-    - image: cimg/go:1.25
+    - image: cimg/go:1.20
   environment:
     <<: *default_env
 
