@@ -1,6 +1,6 @@
 module github.com/premkit/premkit
 
-go 1.17
+go 1.25
 
 require (
 	github.com/Sirupsen/logrus v0.10.1-0.20160601113210-f3cfb454f4c2
