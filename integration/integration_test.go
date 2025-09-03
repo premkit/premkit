@@ -8,7 +8,7 @@ import (
 	"os"
 	"testing"
 
-	"github.com/premkit/premkit/handlers/v1"
+	v1 "github.com/premkit/premkit/handlers/v1"
 	"github.com/premkit/premkit/models"
 	"github.com/premkit/premkit/server"
 
@@ -87,7 +87,7 @@ func setup() error {
 		Send(registerParams).
 		End()
 	if len(errs) != 0 {
-		fmt.Printf("Unexpected errs from registering service: %+#v", errs)
+		fmt.Printf("Unexpected errs from registering service: %q", errs)
 		os.Exit(1)
 	}
 	if resp.StatusCode != http.StatusCreated {
