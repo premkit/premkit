@@ -1,6 +1,6 @@
 module github.com/premkit/premkit
 
-go 1.23
+go 1.23.0
 
 require (
 	github.com/Sirupsen/logrus v0.10.1-0.20160601113210-f3cfb454f4c2
@@ -30,8 +30,8 @@ require (
 	github.com/spf13/cast v0.0.0-20160314192028-27b586b42e29 // indirect
 	github.com/spf13/jwalterweatherman v0.0.0-20160311093646-33c24e77fb80 // indirect
 	github.com/spf13/pflag v0.0.0-20160610190902-367864438f1b // indirect
-	golang.org/x/net v0.17.0 // indirect
-	golang.org/x/sys v0.13.0 // indirect
+	golang.org/x/net v0.38.0 // indirect
+	golang.org/x/sys v0.31.0 // indirect
 	gopkg.in/check.v1 v1.0.0-20201130134442-10cb98267c6c // indirect
 	gopkg.in/yaml.v2 v2.2.8 // indirect
 )
