@@ -17,7 +17,7 @@ require (
 require (
 	github.com/BurntSushi/toml v0.2.1-0.20160707233338-ffaa107fbd88 // indirect
 	github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc // indirect
-	github.com/elazarl/goproxy v0.0.0-20210801061803-8e322dfb79c4 // indirect
+	github.com/elazarl/goproxy v1.2.1 // indirect
 	github.com/fsnotify/fsnotify v1.3.1 // indirect
 	github.com/gorilla/context v0.0.0-20160525203319-aed02d124ae4 // indirect
 	github.com/hashicorp/hcl v0.0.0-20160708141338-364df430845a // indirect
@@ -30,8 +30,8 @@ require (
 	github.com/spf13/cast v0.0.0-20160314192028-27b586b42e29 // indirect
 	github.com/spf13/jwalterweatherman v0.0.0-20160311093646-33c24e77fb80 // indirect
 	github.com/spf13/pflag v0.0.0-20160610190902-367864438f1b // indirect
-	golang.org/x/net v0.17.0 // indirect
-	golang.org/x/sys v0.13.0 // indirect
+	golang.org/x/net v0.33.0 // indirect
+	golang.org/x/sys v0.28.0 // indirect
 	gopkg.in/check.v1 v1.0.0-20201130134442-10cb98267c6c // indirect
 	gopkg.in/yaml.v2 v2.2.8 // indirect
 )
