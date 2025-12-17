@@ -12,7 +12,7 @@ import (
 	"github.com/premkit/premkit/log"
 	"github.com/premkit/premkit/models"
 
-	"github.com/Sirupsen/logrus"
+	"github.com/sirupsen/logrus"
 	cleanhttp "github.com/hashicorp/go-cleanhttp"
 	"github.com/vulcand/oxy/forward"
 )

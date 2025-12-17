@@ -1,4 +1,4 @@
-FROM golang:1.23
+FROM golang:1.25
 
 RUN go install github.com/go-swagger/go-swagger/cmd/swagger@v0.31.0
 
