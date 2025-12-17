@@ -12,6 +12,7 @@ import (
 )
 
 // Upstream represents a single upstream that will be added to a service.
+// swagger:model
 type Upstream struct {
 	URL string `json:"url"`
 

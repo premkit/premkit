@@ -1,16 +1,16 @@
 module github.com/premkit/premkit
 
-go 1.23.0
+go 1.25.5
 
 require (
-	github.com/Sirupsen/logrus v0.10.1-0.20160601113210-f3cfb454f4c2
 	github.com/boltdb/bolt v1.3.1-0.20170131192018-e9cf4fae01b5
 	github.com/gorilla/mux v0.0.0-20160605233521-9fa818a44c2b
 	github.com/hashicorp/go-cleanhttp v0.5.0
 	github.com/parnurzeal/gorequest v0.2.14-0.20160312085432-c4a74a6708c9
+	github.com/sirupsen/logrus v1.9.3
 	github.com/spf13/cobra v0.0.0-20160708202402-a272c3cbd5ff
 	github.com/spf13/viper v0.0.0-20160605220307-c1ccc378a054
-	github.com/stretchr/testify v1.2.3-0.20181014000028-04af85275a5c
+	github.com/stretchr/testify v1.7.0
 	github.com/vulcand/oxy v0.0.0-20160623194703-40720199a16c
 )
 
@@ -34,4 +34,5 @@ require (
 	golang.org/x/sys v0.31.0 // indirect
 	gopkg.in/check.v1 v1.0.0-20201130134442-10cb98267c6c // indirect
 	gopkg.in/yaml.v2 v2.2.8 // indirect
+	gopkg.in/yaml.v3 v3.0.0-20200313102051-9f266ea9e77c // indirect
 )

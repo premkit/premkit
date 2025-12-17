@@ -14,6 +14,7 @@ import (
 )
 
 // Service represents a single registered service with this reverse proxy.
+// swagger:model
 type Service struct {
 	Name      string      `json:"name"`
 	Path      string      `json:"path"`

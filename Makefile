@@ -30,7 +30,7 @@ run:
 .PHONY: swagger_spec
 swagger_spec:
 	mkdir -p ./spec/v1
-	swagger generate spec -w ./handlers/v1 -o ./spec/v1/swagger.json  ./...
+	swagger generate spec -w ./handlers/v1 --scan-models -o ./spec/v1/swagger.json  ./...
 	swagger validate ./spec/v1/swagger.json
 
 .PHONY: docker
