@@ -17,7 +17,7 @@ require (
 require (
 	github.com/BurntSushi/toml v0.2.1-0.20160707233338-ffaa107fbd88 // indirect
 	github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc // indirect
-	github.com/elazarl/goproxy v0.0.0-20210801061803-8e322dfb79c4 // indirect
+	github.com/elazarl/goproxy v1.2.1 // indirect
 	github.com/fsnotify/fsnotify v1.3.1 // indirect
 	github.com/gorilla/context v0.0.0-20160525203319-aed02d124ae4 // indirect
 	github.com/hashicorp/hcl v0.0.0-20160708141338-364df430845a // indirect
