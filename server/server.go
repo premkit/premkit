@@ -30,13 +30,13 @@ func Run(config *Config) error {
 		}()
 	}
 
-	pair, err := tls.LoadX509KeyPair(config.TLSCertFile, config.TLSKeyFile)
-	if err != nil {
-		log.Errorf("Failed to load x509 key pair: %v", err)
-		return err
-	}
-
 	if config.HTTPSPort != 0 {
+		pair, err := tls.LoadX509KeyPair(config.TLSCertFile, config.TLSKeyFile)
+		if err != nil {
+			log.Errorf("Failed to load x509 key pair: %v", err)
+			return err
+		}
+
 		go func() {
 			log.Infof("Listening on port %d for https connections", config.HTTPSPort)
 			srv := &http.Server{
