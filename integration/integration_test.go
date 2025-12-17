@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"os"
 	"testing"
+	"time"
 
 	v1 "github.com/premkit/premkit/handlers/v1"
 	"github.com/premkit/premkit/models"
@@ -32,6 +33,26 @@ func TestMain(m *testing.M) {
 	os.Exit(result)
 }
 
+func waitForServer(url string, maxWait time.Duration) error {
+	deadline := time.Now().Add(maxWait)
+	delay := 10 * time.Millisecond
+
+	for time.Now().Before(deadline) {
+		resp, err := http.Get(url)
+		if err == nil {
+			resp.Body.Close()
+			return nil
+		}
+
+		time.Sleep(delay)
+		delay *= 2
+		if delay > 100*time.Millisecond {
+			delay = 100 * time.Millisecond
+		}
+	}
+	return fmt.Errorf("server did not become ready within %v", maxWait)
+}
+
 func setup() error {
 	originalDataFile := viper.GetString("data_file")
 	defer func() {
@@ -50,6 +71,11 @@ func setup() error {
 	}
 	go server.Run(&config)
 
+	// Wait for the server to be ready
+	if err := waitForServer("http://localhost:9141/", time.Second); err != nil {
+		return fmt.Errorf("premkit server failed to start: %w", err)
+	}
+
 	// Start a custom upstream echo server
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		s := make(map[string]interface{})
@@ -64,6 +90,11 @@ func setup() error {
 	go func() {
 		http.ListenAndServe(":9142", nil)
 	}()
+
+	// Wait for the echo server to be ready
+	if err := waitForServer("http://localhost:9142/", time.Second); err != nil {
+		return fmt.Errorf("echo server failed to start: %w", err)
+	}
 
 	// Register that upstream
 	service := models.Service{
