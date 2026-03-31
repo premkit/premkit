@@ -7,7 +7,7 @@ import (
 
 	"github.com/premkit/premkit/log"
 
-	"github.com/boltdb/bolt"
+	bolt "go.etcd.io/bbolt"
 	"github.com/spf13/viper"
 )
 

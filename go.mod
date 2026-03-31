@@ -3,36 +3,39 @@ module github.com/premkit/premkit
 go 1.25.5
 
 require (
-	github.com/boltdb/bolt v1.3.1-0.20170131192018-e9cf4fae01b5
-	github.com/gorilla/mux v0.0.0-20160605233521-9fa818a44c2b
-	github.com/hashicorp/go-cleanhttp v0.5.0
-	github.com/parnurzeal/gorequest v0.2.14-0.20160312085432-c4a74a6708c9
-	github.com/sirupsen/logrus v1.9.3
-	github.com/spf13/cobra v0.0.0-20160708202402-a272c3cbd5ff
-	github.com/spf13/viper v0.0.0-20160605220307-c1ccc378a054
-	github.com/stretchr/testify v1.7.0
-	github.com/vulcand/oxy v0.0.0-20160623194703-40720199a16c
+	github.com/gorilla/mux v1.8.1
+	github.com/hashicorp/go-cleanhttp v0.5.2
+	github.com/parnurzeal/gorequest v0.3.0
+	github.com/sirupsen/logrus v1.9.4
+	github.com/spf13/cobra v1.10.2
+	github.com/spf13/viper v1.21.0
+	github.com/stretchr/testify v1.11.1
+	github.com/vulcand/oxy v1.4.2
+	go.etcd.io/bbolt v1.4.3
 )
 
 require (
-	github.com/BurntSushi/toml v0.2.1-0.20160707233338-ffaa107fbd88 // indirect
 	github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc // indirect
 	github.com/elazarl/goproxy v1.2.1 // indirect
-	github.com/fsnotify/fsnotify v1.3.1 // indirect
-	github.com/gorilla/context v0.0.0-20160525203319-aed02d124ae4 // indirect
-	github.com/hashicorp/hcl v0.0.0-20160708141338-364df430845a // indirect
-	github.com/inconshreveable/mousetrap v1.0.0 // indirect
-	github.com/magiconair/properties v1.7.1-0.20160705171333-e2f061ecfdac // indirect
-	github.com/mitchellh/mapstructure v0.0.0-20160212031839-d2dd02622084 // indirect
+	github.com/fsnotify/fsnotify v1.9.0 // indirect
+	github.com/go-viper/mapstructure/v2 v2.4.0 // indirect
+	github.com/gorilla/websocket v1.5.0 // indirect
+	github.com/inconshreveable/mousetrap v1.1.0 // indirect
 	github.com/moul/http2curl v0.0.0-20160520213128-b1479103caac // indirect
+	github.com/pelletier/go-toml/v2 v2.2.4 // indirect
+	github.com/pkg/errors v0.9.1 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
+	github.com/sagikazarmark/locafero v0.11.0 // indirect
 	github.com/smartystreets/goconvey v1.6.4 // indirect
-	github.com/spf13/cast v0.0.0-20160314192028-27b586b42e29 // indirect
-	github.com/spf13/jwalterweatherman v0.0.0-20160311093646-33c24e77fb80 // indirect
-	github.com/spf13/pflag v0.0.0-20160610190902-367864438f1b // indirect
+	github.com/sourcegraph/conc v0.3.1-0.20240121214520-5f936abd7ae8 // indirect
+	github.com/spf13/afero v1.15.0 // indirect
+	github.com/spf13/cast v1.10.0 // indirect
+	github.com/spf13/pflag v1.0.10 // indirect
+	github.com/subosito/gotenv v1.6.0 // indirect
+	go.yaml.in/yaml/v3 v3.0.4 // indirect
 	golang.org/x/net v0.38.0 // indirect
 	golang.org/x/sys v0.31.0 // indirect
+	golang.org/x/text v0.28.0 // indirect
 	gopkg.in/check.v1 v1.0.0-20201130134442-10cb98267c6c // indirect
-	gopkg.in/yaml.v2 v2.2.8 // indirect
-	gopkg.in/yaml.v3 v3.0.0-20200313102051-9f266ea9e77c // indirect
+	gopkg.in/yaml.v3 v3.0.1 // indirect
 )

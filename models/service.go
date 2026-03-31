@@ -10,7 +10,7 @@ import (
 	"github.com/premkit/premkit/persistence"
 	"github.com/premkit/premkit/utils"
 
-	"github.com/boltdb/bolt"
+	bolt "go.etcd.io/bbolt"
 )
 
 // Service represents a single registered service with this reverse proxy.
