@@ -9,7 +9,7 @@ import (
 	"github.com/premkit/premkit/models"
 	"github.com/premkit/premkit/persistence"
 
-	"github.com/boltdb/bolt"
+	bolt "go.etcd.io/bbolt"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )

@@ -8,7 +8,7 @@ import (
 	"github.com/premkit/premkit/log"
 	"github.com/premkit/premkit/persistence"
 
-	"github.com/boltdb/bolt"
+	bolt "go.etcd.io/bbolt"
 )
 
 // Upstream represents a single upstream that will be added to a service.
