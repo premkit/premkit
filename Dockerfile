@@ -1,6 +1,4 @@
-FROM golang:1.25
-
-RUN go install github.com/go-swagger/go-swagger/cmd/swagger@v0.31.0
+FROM golang:1.26
 
 ENV PROJECTPATH=/go/src/github.com/premkit/premkit
 ENV PATH $PATH:$PROJECTPATH/go/bin
